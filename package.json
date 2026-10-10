@@ -1,0 +1,14 @@
+{
+  "name": "opencode2api-dev",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:web": "node --check webui/app.js && node --check webui/theme.js",
+    "test:web": "node tests/run-webui-regression.mjs"
+  },
+  "devDependencies": {
+    "prettier": "3.9.6",
+    "@playwright/cli": "0.1.22"
+  }
+}

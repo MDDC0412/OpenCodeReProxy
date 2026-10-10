@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>opencode2api</title>
+    <script src="/theme.js"></script>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <section id="login" class="login">
+      <form id="login-form" class="login-card">
+        <div class="brand">opencode2api</div>
+        <h2>登录管理控制台</h2>
+        <div class="field">
+          <label for="login-user">账号</label
+          ><input id="login-user" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="login-pass">密码</label
+          ><input id="login-pass" type="password" autocomplete="current-password" required />
+        </div>
+        <div id="login-error" class="alert alert-bad"></div>
+        <div class="actions">
+          <button class="btn btn-primary btn-block">登录</button>
+        </div>
+      </form>
+    </section>
+
+    <div id="app" class="layout hidden">
+      <aside class="sidebar">
+        <div class="sidebar-title">
+          <span class="brand-link">opencode2api</span>
+          <span>管理控制台</span>
+        </div>
+        <nav class="nav">
+          <div class="nav-group">
+            <div class="nav-group-label">运营</div>
+            <button data-page="overview" class="active">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z" />
+              </svg>
+              <span>总览</span>
+            </button>
+            <button data-page="playground">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 17l6-6-6-6M12 19h8" />
+              </svg>
+              <span>请求台</span>
+            </button>
+            <button data-page="access">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7"
+                />
+              </svg>
+              <span>接入</span>
+            </button>
+            <button data-page="logs">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h10" />
+              </svg>
+              <span>事件日志</span>
+            </button>
+          </div>
+          <div class="nav-group">
+            <div class="nav-group-label">密钥与模型</div>
+            <button data-page="api-keys">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="8" cy="12" r="4" />
+                <path d="M12 12h9M18 12v3M15 12v2" />
+              </svg>
+              <span>API Key</span>
+            </button>
+            <button data-page="models">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 3v18M4 7.5l8 4.5 8-4.5" />
+              </svg>
+              <span>模型与额度</span>
+            </button>
+            <button data-page="rotation">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 12a8 8 0 11-2.3-5.7M20 4v5h-5" />
+              </svg>
+              <span>模型轮转</span>
+            </button>
+          </div>
+          <div class="nav-group">
+            <div class="nav-group-label">系统</div>
+            <button data-page="config">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1A1.6 1.6 0 007 19.4l-.1.1a2 2 0 11-2.8-2.8l.1-.1A1.6 1.6 0 003 14H3a2 2 0 110-4h.1A1.6 1.6 0 005 7l-.1-.1a2 2 0 112.8-2.8l.1.1A1.6 1.6 0 0011 3V3a2 2 0 114 0v.1a1.6 1.6 0 002.7 1.1l.1-.1a2 2 0 112.8 2.8l-.1.1A1.6 1.6 0 0021 11h.1a2 2 0 110 4H21z"
+                />
+              </svg>
+              <span>配置</span>
+            </button>
+            <button data-page="account">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 21a8 8 0 0116 0" />
+              </svg>
+              <span>账号</span>
+            </button>
+          </div>
+        </nav>
+        <div class="sidebar-foot"><span id="version">—</span></div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <h1 id="page-title">总览</h1>
+          <div class="toolbar">
+            <button
+              id="theme-toggle"
+              class="btn btn-icon"
+              aria-label="切换主题"
+              title="切换白天 / 黑夜"
+            >
+              <svg class="nav-icon theme-sun" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <path
+                  d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"
+                />
+              </svg>
+              <svg class="nav-icon theme-moon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 15a8 8 0 01-11-11 8 8 0 1011 11z" />
+              </svg>
+            </button>
+            <button id="theme-color" class="btn btn-icon" aria-label="主题色" title="主题色">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 3a9 9 0 100 18h1.5a2 2 0 001.6-3.2 2 2 0 011.6-3.2H19a3 3 0 003-3 9 9 0 00-10-8.6z"
+                />
+                <circle cx="7.5" cy="11" r="1" />
+                <circle cx="10" cy="7" r="1" />
+                <circle cx="15" cy="7.5" r="1" />
+              </svg>
+            </button>
+            <button id="refresh-now" class="btn btn-icon" aria-label="刷新" title="刷新">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 12a8 8 0 11-2.3-5.7M20 4v5h-5" />
+              </svg>
+            </button>
+            <button id="logout" class="btn btn-icon" aria-label="退出" title="退出">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 4H4v16h6M14 8l4 4-4 4M9 12h12" />
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- 总览 -->
+        <section id="page-overview" class="page">
+          <!-- 1. 状态：一眼回答“现在正常吗” -->
+          <div class="status-bar">
+            <div id="health" class="health">
+              <span class="health-dot"></span>
+              <span id="health-text">载入中…</span>
+            </div>
+            <button
+              id="guide-box"
+              type="button"
+              class="status-link"
+              aria-expanded="false"
+              aria-controls="guide-items"
+            >
+              <span id="guide-summary">状态检查 —</span>
+              <svg class="nav-icon checklist-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+          </div>
+          <ul id="guide-items" class="checklist-items hidden"></ul>
+          <div id="attention" class="alert alert-warn hidden">
+            <div id="attention-list"></div>
+          </div>
+
+          <!-- 2. 核心：三个决策数字，各自独立 -->
+          <div class="stat-row">
+            <div class="stat">
+              <div class="stat-label">近 1 小时请求</div>
+              <div id="m-total" class="stat-value">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">成功率</div>
+              <div id="m-rate" class="stat-value">—</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">P95 延迟</div>
+              <div id="m-p95" class="stat-value">—</div>
+            </div>
+          </div>
+
+          <!-- 3. 次级：其余指标压成一行，不与核心数字争夺注意力 -->
+          <div class="chip-row">
+            <span class="chip-item">并发<b id="m-active">—</b></span>
+            <span class="chip-item">流式<b id="m-streams">—</b></span>
+            <span class="chip-item">Token<b id="u-total">—</b></span>
+            <span class="chip-item">缓存<b id="u-cached">—</b></span>
+            <span class="chip-item">推理<b id="u-reasoning">—</b></span>
+            <span class="chip-item">覆盖率<b id="u-coverage">—</b></span>
+          </div>
+
+          <!-- 4. 趋势：占满宽度，是唯一需要看形状的图 -->
+          <div class="card">
+            <div class="card-head">
+              <h2>每分钟 Token</h2>
+              <button class="help-btn" data-help="trend" aria-label="说明" aria-expanded="false">
+                ?
+              </button>
+            </div>
+            <div id="help-trend" class="help-body hidden">
+              近 1 小时，悬停查看输入、输出与总量。
+            </div>
+            <div id="usage-trend" class="trend"></div>
+          </div>
+
+          <!-- 5. 资源：出问题时会反映在健康状态里 -->
+          <div class="split">
+            <div class="card">
+              <div class="card-head">
+                <h2>Key 池</h2>
+                <button
+                  class="help-btn"
+                  data-help="keypool"
+                  aria-label="说明"
+                  aria-expanded="false"
+                >
+                  ?
+                </button>
+              </div>
+              <div id="help-keypool" class="help-body hidden">
+                上游 Key 只显示尾码与冷却状态，不显示完整值。
+              </div>
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>尾码</th>
+                      <th>Tier</th>
+                      <th>状态</th>
+                    </tr>
+                  </thead>
+                  <tbody id="key-table"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h2>Proxy 节点</h2>
+                <button class="help-btn" data-help="proxy" aria-label="说明" aria-expanded="false">
+                  ?
+                </button>
+              </div>
+              <div id="help-proxy" class="help-body hidden">
+                这里显示代理节点，不将其描述为出口 IP。
+              </div>
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>节点</th>
+                      <th>健康</th>
+                      <th>绑定</th>
+                    </tr>
+                  </thead>
+                  <tbody id="proxy-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. 请求和用量明细默认可见 -->
+          <div id="recent-requests" class="card">
+            <div class="card-head">
+              <h2>最近请求</h2>
+              <div class="requests-controls">
+                <span class="card-note">近 1 小时</span>
+                <label class="requests-filter">
+                  <input id="requests-failed-only" type="checkbox" />
+                  仅失败
+                </label>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="table table-wide">
+                <thead>
+                  <tr>
+                    <th>时间</th>
+                    <th>Request ID</th>
+                    <th>模型</th>
+                    <th>通道</th>
+                    <th>状态</th>
+                    <th>耗时</th>
+                  </tr>
+                </thead>
+                <tbody id="upstream-requests"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="split">
+            <div class="card">
+              <div class="card-head"><h2>模型 Token 用量</h2></div>
+              <div class="table-wrap">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>模型</th>
+                      <th>总量</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usage-models"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h2>通道 Token 用量</h2></div>
+              <div id="usage-tiers"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>请求分布</h2></div>
+            <div id="breakdowns" class="split-3"></div>
+          </div>
+        </section>
+
+        <!-- 接入与测试 -->
+        <section id="page-access" class="page hidden">
+          <div class="split">
+            <div class="card">
+              <div class="card-head">
+                <h2>基础地址</h2>
+                <button class="help-btn" data-help="base" aria-label="说明" aria-expanded="false">
+                  ?
+                </button>
+              </div>
+              <div id="help-base" class="help-body hidden">
+                OpenAI 兼容客户端用 <code>Authorization: Bearer YOUR_API_KEY</code>；Anthropic
+                客户端用 <code>x-api-key</code>，路径为 <code>/v1/messages</code>。 监听地址为
+                <code>0.0.0.0</code> 时，示例改用当前浏览器主机名。
+              </div>
+              <div class="field">
+                <label for="access-base-value">API Base</label
+                ><input id="access-base-value" readonly />
+              </div>
+              <div class="field">
+                <label for="access-model">示例模型</label
+                ><input id="access-model" value="YOUR_MODEL" />
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h2>接入注意</h2>
+                <button class="help-btn" data-help="notes" aria-label="说明" aria-expanded="false">
+                  ?
+                </button>
+              </div>
+              <div id="help-notes" class="help-body hidden">
+                流式请求会保持原协议事件，跨协议时由 Gateway 转换；示例不会写入真实 Server Key。
+                响应通过 <code>x-request-id</code> 提供请求关联标识，请求体上限 32 MiB。
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h2>三种协议入口</h2>
+              <button class="help-btn" data-help="curl" aria-label="说明" aria-expanded="false">
+                ?
+              </button>
+            </div>
+            <div id="help-curl" class="help-body hidden">
+              将 <code>YOUR_API_KEY</code> 换成 API Key 页里的密钥，模型名换成实际可用模型。
+            </div>
+            <div id="access-protocol-examples"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h2>SDK 示例</h2></div>
+            <div id="access-sdk-examples"></div>
+          </div>
+        </section>
+
+        <!-- 请求台 -->
+        <section id="page-playground" class="page hidden">
+          <div class="play-grid">
+            <div class="card">
+              <div class="card-head">
+                <h2>请求</h2>
+                <button class="help-btn" data-help="pg" aria-label="说明" aria-expanded="false">
+                  ?
+                </button>
+              </div>
+              <div id="help-pg" class="help-body hidden">
+                服务端强制非流式并经由真实 Gateway 路由。指定具体 Key 后只测试该 Key，不切换
+                Key、Tier 或匿名通道，也不改变其冷却与代理状态；诊断仍会计入监控。
+              </div>
+              <form id="play-form">
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="play-protocol">入口协议</label
+                    ><select id="play-protocol">
+                      <option value="chat">Chat Completions</option>
+                      <option value="responses">Responses</option>
+                      <option value="anthropic">Anthropic Messages</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="play-model">模型</label>
+                    <div id="play-model"></div>
+                  </div>
+                  <div class="field span-2">
+                    <label for="play-key">上游 Key</label
+                    ><select id="play-key">
+                      <option value="auto">自动路由</option>
+                    </select>
+                  </div>
+                  <div class="field span-2">
+                    <label for="play-request">请求 JSON</label
+                    ><textarea id="play-request" class="json-editor" spellcheck="false"></textarea>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button id="play-reset" type="button" class="btn">重置模板</button
+                  ><button id="play-run" class="btn btn-primary">发送</button>
+                </div>
+              </form>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h2>结果</h2>
+                <span id="play-state" class="card-note">尚未发送请求。</span>
+              </div>
+              <div id="play-facts" class="fact-grid"></div>
+              <div class="code-card">
+                <div class="code-head">
+                  <span>原始响应</span
+                  ><button id="play-copy" type="button" class="btn btn-sm">复制</button>
+                </div>
+                <pre id="play-output">{}</pre>
+              </div>
+              <details class="collapse">
+                <summary>最近一次诊断</summary>
+                <div class="collapse-body">
+                  <div id="last-playground" class="fact-grid"></div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <!-- 模型与额度 -->
+        <section id="page-models" class="page hidden">
+          <div class="card">
+            <div class="card-head">
+              <h2>Go 套餐额度</h2>
+              <button id="quota-refresh" class="btn btn-sm">刷新</button>
+              <button class="help-btn" data-help="quota" aria-label="说明" aria-expanded="false">
+                ?
+              </button>
+            </div>
+            <div id="help-quota" class="help-body hidden">
+              所有模型共享套餐窗口，百分比由上游取整，多个 Key 的额度不相加。成功缓存 60 秒，
+              失败缓存 15 秒；失败时保留上次成功结果并标记为历史数据。
+            </div>
+            <div class="field">
+              <label for="quota-account">Go Key</label
+              ><select id="quota-account">
+                <option>读取中…</option>
+              </select>
+            </div>
+            <div id="quota-status" class="alert alert-quiet" role="status"></div>
+            <div id="quota-cards" class="quota-grid"></div>
+            <div id="quota-updated" class="card-note"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h2>可用模型 <span id="quota-model-count" class="card-note"></span></h2>
+              <input
+                id="quota-model-search"
+                placeholder="搜索模型"
+                type="search"
+                aria-label="搜索模型"
+              />
+            </div>
+            <div id="quota-catalog-status" class="card-note"></div>
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>模型</th>
+                    <th>协议</th>
+                    <th>5 小时</th>
+                    <th>每周</th>
+                    <th>每月</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="quota-models"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <details class="collapse">
+              <summary>免费模型可用性</summary>
+              <div class="collapse-body">
+                <div class="card-head">
+                  <span class="card-note">
+                    每小时探测一次，仅在明确失效时禁用，24
+                    小时后复测；限流、超时与网络错误不新增禁用。
+                  </span>
+                  <button id="availability-refresh" class="btn btn-sm">刷新</button>
+                </div>
+                <p id="availability-error" class="alert alert-bad"></p>
+                <div class="table-wrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>模型</th>
+                        <th>状态</th>
+                        <th>通道 / 结果</th>
+                        <th>思考档位</th>
+                        <th>上次探测</th>
+                        <th>下次探测</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="availability-models"></tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <div class="card">
+            <details class="collapse">
+              <summary>模型目录与路由</summary>
+              <div class="collapse-body">
+                <div id="metadata-facts" class="fact-grid"></div>
+                <div class="table-wrap advance">
+                  <input
+                    id="diagnostic-model-search"
+                    placeholder="筛选模型"
+                    aria-label="筛选模型"
+                  />
+                </div>
+                <div class="table-wrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>模型</th>
+                        <th>原生协议</th>
+                        <th>路由</th>
+                        <th>匿名资格</th>
+                        <th>来源</th>
+                        <th>成本 in / out</th>
+                      </tr>
+                    </thead>
+                    <tbody id="diagnostic-models"></tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <!-- API Key -->
+        <section id="page-api-keys" class="page hidden">
+          <div class="card">
+            <details class="collapse" id="key-form-box">
+              <summary>新建密钥</summary>
+              <div class="collapse-body">
+                <form id="api-key-form">
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="api-key-name">名称</label
+                      ><input
+                        id="api-key-name"
+                        placeholder="例如：Claude Code"
+                        maxlength="80"
+                        required
+                      />
+                    </div>
+                    <div class="field">
+                      <label for="api-key-value">自定义 Key（可选）</label
+                      ><input
+                        id="api-key-value"
+                        type="password"
+                        autocomplete="new-password"
+                        minlength="16"
+                        maxlength="256"
+                        placeholder="留空自动生成"
+                      />
+                    </div>
+                  </div>
+                  <div class="card-note">
+                    自动生成 192 位随机密钥；自定义需 16–256
+                    位英文字母、数字、短横线、下划线或点，最多 200 个。
+                  </div>
+                  <div class="actions">
+                    <button id="api-key-create" class="btn btn-primary">创建</button>
+                  </div>
+                </form>
+              </div>
+            </details>
+          </div>
+
+          <div id="api-key-created" class="card hidden">
+            <div class="card-head">
+              <h2>密钥已创建</h2>
+              <button id="api-key-dismiss" class="btn btn-sm">关闭</button>
+            </div>
+            <div class="card-note">完整密钥仅在此处展示一次，请保存到调用方环境变量。</div>
+            <pre id="api-key-env" class="key-plain"></pre>
+            <div class="actions">
+              <button id="api-key-copy" class="btn">复制 Key</button
+              ><button id="api-key-copy-env" class="btn">复制环境变量</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h2>密钥列表 <span id="api-key-count" class="card-note"></span></h2>
+              <button id="api-key-refresh" class="btn btn-sm">刷新</button>
+              <button class="help-btn" data-help="apikeys" aria-label="说明" aria-expanded="false">
+                ?
+              </button>
+            </div>
+            <div id="help-apikeys" class="help-body hidden">
+              至少保留一个启用的 Key；停用或删除后该应用的新请求返回 401。列表只显示尾码，
+              导入时才会向服务端请求一次完整明文。
+            </div>
+            <div id="api-key-status" class="card-note"></div>
+            <div class="table-wrap">
+              <table class="table table-wide">
+                <thead>
+                  <tr>
+                    <th>名称</th>
+                    <th>尾码</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="api-key-list"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 模型轮转 -->
+        <section id="page-rotation" class="page hidden">
+          <div class="card">
+            <div class="card-head">
+              <h2>分组轮转</h2>
+              <button class="help-btn" data-help="rot" aria-label="说明" aria-expanded="false">
+                ?
+              </button>
+            </div>
+            <div id="help-rot" class="help-body hidden">
+              将 model 设为别名即可调用。成功后保持当前模型，出错或额度不足时按顺序切换：
+              普通错误每模型最多尝试 3 次，一次请求最多重试 3 个模型；额度不足直接跳过。
+              输出开始后本次回答固定使用同一模型，中途故障结束本次输出而不拼接替代答案。
+              模型共享套餐额度，切换不保证解决套餐耗尽。
+            </div>
+            <div id="rotation-status" class="card-note"></div>
+          </div>
+          <form id="rotation-form">
+            <div id="rotation-draft" class="alert alert-warn hidden" role="status">
+              有未保存的修改
+            </div>
+            <div id="rotation-groups"></div>
+            <div class="card">
+              <div class="field">
+                <label for="rotation-timeout">首个有效输出等待上限（秒）</label
+                ><input id="rotation-timeout" type="number" min="1" max="300" value="30" required />
+              </div>
+              <div class="actions">
+                <button id="rotation-refresh" type="button" class="btn">刷新状态</button
+                ><button id="rotation-save" class="btn btn-primary">保存</button>
+              </div>
+            </div>
+          </form>
+          <div class="card">
+            <details class="collapse">
+              <summary>最近请求尝试</summary>
+              <div class="collapse-body">
+                <div class="card-note">最多展示最近 100 次尝试。</div>
+                <div class="table-wrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>时间</th>
+                        <th>请求</th>
+                        <th>别名</th>
+                        <th>实际模型</th>
+                        <th>尝试</th>
+                        <th>结果</th>
+                      </tr>
+                    </thead>
+                    <tbody id="rotation-attempts"></tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <!-- 配置 -->
+        <section id="page-config" class="page hidden">
+          <form id="config-form">
+            <div class="card">
+              <div class="card-head">
+                <h2>服务与管理端</h2>
+                <button class="help-btn" data-help="listen" aria-label="说明" aria-expanded="false">
+                  ?
+                </button>
+              </div>
+              <div id="help-listen" class="help-body hidden">
+                监听地址与 WebUI 开关保存后需重启进程；Session TTL 范围 5–10080 分钟。
+              </div>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="c-prefer">认证 Key 首选 Tier</label
+                  ><select id="c-prefer">
+                    <option value="go">Go（失败回退 Zen）</option>
+                    <option value="zen">Zen（失败回退 Go）</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="c-listen">API Listen</label><input id="c-listen" />
+                </div>
+                <div class="field">
+                  <label for="c-web-listen">WebUI Listen</label><input id="c-web-listen" />
+                </div>
+                <div class="field">
+                  <label for="c-session">Session TTL（分钟）</label
+                  ><input id="c-session" type="number" />
+                </div>
+                <div class="field span-2">
+                  <label class="check"
+                    ><input id="c-web-enabled" type="checkbox" />启用 WebUI（需重启）</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <h2>密钥与匿名通道</h2>
+                <button id="reveal" type="button" class="btn btn-sm">二次验证查看</button>
+              </div>
+              <div class="form-grid">
+                <div class="field span-2">
+                  <label class="check"
+                    ><input id="c-anonymous" type="checkbox" />启用 Zen 匿名通道</label
+                  >
+                </div>
+                <div class="field span-2">
+                  <label>Server Keys</label>
+                  <div id="server_keys-chips" class="chips"></div>
+                  <textarea id="server_keys-new" placeholder="每行新增一个"></textarea>
+                </div>
+                <div class="field">
+                  <label>Zen Keys</label>
+                  <div id="zen_keys-chips" class="chips"></div>
+                  <textarea id="zen_keys-new" placeholder="每行新增一个"></textarea>
+                </div>
+                <div class="field">
+                  <label>Go Keys</label>
+                  <div id="go_keys-chips" class="chips"></div>
+                  <textarea id="go_keys-new" placeholder="每行新增一个"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h2>Proxy 节点</h2></div>
+              <div id="proxies-chips" class="chips"></div>
+              <div class="form-grid">
+                <div class="field">
+                  <label>新增 Proxy（每行一个）</label
+                  ><textarea
+                    id="proxies-new"
+                    placeholder="direct&#10;http://user:pass@host:port"
+                  ></textarea>
+                </div>
+                <div class="field">
+                  <label for="c-proxyfile">Proxy File</label
+                  ><input id="c-proxyfile" placeholder="proxies.txt" />
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <h2>上游与协议路由</h2>
+                <button class="help-btn" data-help="route" aria-label="说明" aria-expanded="false">
+                  ?
+                </button>
+              </div>
+              <div id="help-route" class="help-body hidden">
+                anonymous 会耗尽可用 Proxy；显式协议映射优先于模型名称推断。请求总超时包含流式读取，
+                单次尝试超时为 0 时跟随总超时。
+              </div>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="c-up-zen">Zen URL</label><input id="c-up-zen" />
+                </div>
+                <div class="field"><label for="c-up-go">Go URL</label><input id="c-up-go" /></div>
+                <div class="field">
+                  <label for="c-attempts">每个 Key Tier 最大尝试次数</label
+                  ><input id="c-attempts" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-timeout">请求超时（秒）</label
+                  ><input id="c-timeout" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-refresh">模型刷新（秒）</label
+                  ><input id="c-refresh" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-protocols">模型协议覆盖（JSON）</label
+                  ><textarea id="c-protocols" spellcheck="false">{}</textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <h2>Thinking 强度</h2>
+                <button class="help-btn" data-help="think" aria-label="说明" aria-expanded="false">
+                  ?
+                </button>
+              </div>
+              <div id="help-think" class="help-body hidden">
+                仅在客户端没有明确指定时生效；客户端显式指定的强度始终优先。选“关闭”会移除未明确请求的
+                reasoning。
+              </div>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="c-reasoning-effort">默认强度</label
+                  ><select id="c-reasoning-effort">
+                    <option value="">跟随客户端</option>
+                    <option value="auto">auto</option>
+                    <option value="minimal">minimal</option>
+                    <option value="low">low</option>
+                    <option value="medium">medium</option>
+                    <option value="high">high</option>
+                    <option value="xhigh">xhigh</option>
+                    <option value="max">max</option>
+                    <option value="none">关闭</option>
+                  </select>
+                </div>
+                <div class="field span-2">
+                  <label for="c-reasoning-by-model">按模型覆盖（JSON）</label
+                  ><textarea
+                    id="c-reasoning-by-model"
+                    spellcheck="false"
+                    placeholder='{"model-id":"high"}'
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h2>性能与日志</h2></div>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="c-idle">Max Idle Conns</label><input id="c-idle" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-idle-host">Max Idle / Host</label
+                  ><input id="c-idle-host" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-max-host">Max Conns / Host</label
+                  ><input id="c-max-host" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-idle-timeout">Idle Timeout（秒）</label
+                  ><input id="c-idle-timeout" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-connect">Connect Timeout（秒）</label
+                  ><input id="c-connect" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-cooldown">Failure Cooldown（秒）</label
+                  ><input id="c-cooldown" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-attempt-timeout">Attempt Timeout（秒）</label
+                  ><input id="c-attempt-timeout" type="number" />
+                </div>
+                <div class="field">
+                  <label for="c-first-event-timeout">首个 SSE 事件超时（秒，0 关闭）</label
+                  ><input id="c-first-event-timeout" type="number" min="0" />
+                </div>
+                <div class="field">
+                  <label for="c-level">日志级别</label
+                  ><select id="c-level">
+                    <option>debug</option>
+                    <option>info</option>
+                    <option>warn</option>
+                    <option>error</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="c-ring">日志 Ring Size</label><input id="c-ring" type="number" />
+                </div>
+                <div class="field span-2">
+                  <label class="check"
+                    ><input id="c-dump-bodies" type="checkbox" />转储出站请求体（已脱敏）</label
+                  >
+                </div>
+              </div>
+              <div class="actions">
+                <button id="reload-config" type="button" class="btn">从磁盘重载</button
+                ><button class="btn btn-primary">验证、保存并应用</button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <!-- 日志 -->
+        <section id="page-logs" class="page hidden">
+          <div class="filters">
+            <select id="log-level">
+              <option value="">全部级别</option>
+              <option>debug</option>
+              <option>info</option>
+              <option>warn</option>
+              <option>error</option>
+            </select>
+            <input id="log-component" placeholder="模块" />
+            <input id="log-search" placeholder="搜索事件、Request ID、模型" />
+            <button id="log-pause" class="btn">暂停</button>
+          </div>
+          <div id="log-list" class="logs"></div>
+        </section>
+
+        <!-- 账号 -->
+        <section id="page-account" class="page hidden">
+          <form id="account-form" class="card card-narrow">
+            <div class="card-head">
+              <h2>更新管理账号</h2>
+              <button class="help-btn" data-help="acct" aria-label="说明" aria-expanded="false">
+                ?
+              </button>
+            </div>
+            <div id="help-acct" class="help-body hidden">
+              新密码至少 10 个字符；保存成功后撤销全部管理 Session，需重新登录。
+            </div>
+            <div class="field">
+              <label for="a-user">新账号（留空保持）</label><input id="a-user" />
+            </div>
+            <div class="field">
+              <label for="a-current">当前密码</label
+              ><input id="a-current" type="password" required />
+            </div>
+            <div class="field">
+              <label for="a-new">新密码（留空保持）</label><input id="a-new" type="password" />
+            </div>
+            <div class="actions"><button class="btn btn-primary">更新并重新登录</button></div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <div
+      id="modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="secrets-title"
+    >
+      <div class="modal-card">
+        <div class="card-head">
+          <h2 id="secrets-title">敏感配置</h2>
+          <button id="modal-close" class="btn btn-sm">关闭</button>
+        </div>
+        <pre id="modal-content"></pre>
+      </div>
+    </div>
+
+    <div
+      id="ccswitch-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ccswitch-title"
+    >
+      <div class="modal-card modal-sm">
+        <div class="card-head">
+          <h2 id="ccswitch-title">导入 CC Switch</h2>
+          <button id="ccswitch-close" class="btn btn-sm">关闭</button>
+        </div>
+        <div id="ccswitch-target" class="card-note"></div>
+        <div class="field">
+          <label>目标客户端</label>
+          <div id="ccswitch-clients" class="choice-row"></div>
+        </div>
+        <div class="field">
+          <label for="ccswitch-model">模型</label>
+          <div id="ccswitch-model"></div>
+        </div>
+        <div class="actions">
+          <button id="ccswitch-copy" class="btn">复制导入链接</button>
+          <button id="ccswitch-open" class="btn btn-primary">打开 CC Switch</button>
+        </div>
+        <div id="ccswitch-status" class="card-note" role="status"></div>
+        <div id="ccswitch-fallback-field" class="field hidden">
+          <label for="ccswitch-fallback">导入链接</label>
+          <textarea id="ccswitch-fallback" readonly spellcheck="false"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="theme-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="theme-title"
+    >
+      <div class="modal-card modal-sm">
+        <div class="card-head">
+          <h2 id="theme-title">主题</h2>
+          <button id="theme-close" class="btn btn-sm">关闭</button>
+        </div>
+        <div class="field">
+          <label>模式</label>
+          <div id="theme-modes" class="choice-row"></div>
+        </div>
+        <div class="field">
+          <label>主题色</label>
+          <div id="theme-swatches" class="swatch-row"></div>
+        </div>
+        <div class="field">
+          <label for="theme-custom">自定义</label>
+          <div class="color-custom">
+            <input id="theme-custom" type="color" />
+            <input
+              id="theme-hex"
+              placeholder="#0d9488"
+              maxlength="7"
+              spellcheck="false"
+              aria-label="主题色十六进制值"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="copy-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="copy-title"
+    >
+      <div class="modal-card modal-sm">
+        <div class="card-head">
+          <h2 id="copy-title">手动复制</h2>
+          <button id="copy-close" type="button" class="btn btn-sm">关闭</button>
+        </div>
+        <label for="copy-value">复制内容</label>
+        <textarea id="copy-value" readonly spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div id="toast" class="toast hidden" role="status"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
