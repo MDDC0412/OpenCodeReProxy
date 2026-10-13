@@ -1,4 +1,6 @@
 .key
+/.env
+/*.pid
 config.json
 config.json.bak
 .config-*.tmp

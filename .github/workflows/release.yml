@@ -128,7 +128,7 @@ jobs:
         run: |
           mkdir -p "dist/$PACKAGE_NAME"
           go build -trimpath -ldflags="-s -w -X main.version=$RELEASE_TAG" -o "dist/$PACKAGE_NAME/opencode2api$EXTENSION" ./cmd/opencode2api
-          cp LICENSE config.example.json "dist/$PACKAGE_NAME/"
+          cp LICENSE config.example.json compose.yaml .env.example CHANGELOG.md "dist/$PACKAGE_NAME/"
           cp "docs/distribution/README.$GOOS.md" "dist/$PACKAGE_NAME/README.md"
           cp "docs/distribution/README.$GOOS.zh-CN.md" "dist/$PACKAGE_NAME/README.zh-CN.md"
           cp -r docs "dist/$PACKAGE_NAME/"

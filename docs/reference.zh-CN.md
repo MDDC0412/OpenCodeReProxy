@@ -1,55 +1,26 @@
 # 接口、配置与运行参考
 
-[返回快速开始](../README.zh-CN.md) | [English](reference.md)
+[返回 README](../README.zh-CN.md) | [English](reference.md)
 
-这里保留详细的接口、配置、模型路由和监控说明。首次运行请先完成 README 中的四步启动流程。
+这里保留详细的接口、配置、模型路由和监控说明。首次运行请先按 README 中对应的启动方式完成配置、启动和请求验证。
 
 ## Docker 部署
 
-Compose 默认使用上游镜像 `ghcr.io/jasonxu114514/opencode2api`。如需运行本二开版，请使用本节后面的本地镜像构建与启动命令。
+本项目的镜像为 `ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics`，支持 Linux amd64 / arm64。直接运行、Compose 和源码构建命令见 [README 快速启动](../README.zh-CN.md#快速启动)。
 
-```bash
-cp config.example.json config.json
-# 启动前填写 Key，并替换 WebUI 密码。
-docker compose up -d
-docker compose logs -f
-```
+Compose 从 `config.json` 导入初始配置，将可写状态保存在 `opencode2api-state` 命名卷的 `/var/lib/opencode2api`。首次复制 `.env.example` 为 `.env`，模板显式设置容器监听 `0.0.0.0:8080` / `0.0.0.0:8081`，以便端口映射可达。
 
-Compose **仅在首次启动时**将宿主机配置导入 `opencode2api-state` 命名卷。后续建议通过 WebUI 修改配置。需要重新导入宿主机文件时：
+| Compose 变量                | 模板值                      | 作用                |
+| --------------------------- | --------------------------- | ------------------- |
+| `OPENCODE2API_VERSION`      | `v1.3.7-secdev-diagnostics` | 本项目镜像标签      |
+| `OPENCODE2API_PORT`         | `8080`                      | 宿主机 API 端口     |
+| `OPENCODE2API_WEBUI_PORT`   | `8081`                      | 宿主机管理端口      |
+| `OPENCODE2API_LISTEN`       | `0.0.0.0:8080`              | 容器内 API 监听覆盖 |
+| `OPENCODE2API_WEBUI_LISTEN` | `0.0.0.0:8081`              | 容器内管理监听覆盖  |
 
-```bash
-docker compose cp config.json opencode2api:/var/lib/opencode2api/config.json
-docker compose restart
-```
+运行时配置以卷内文件为准，宿主机文件只在首次初始化时导入。后续在管理页面修改，或按 [README 运维步骤](../README.zh-CN.md#部署与运维)重新导入、修正文件所有者并重启。
 
-容器内的服务进程使用普通用户运行。Compose 启用只读根文件系统，并提供可写状态卷和临时 `/tmp` 文件系统。
-
-| Compose 环境变量            | 默认值   | 作用                                 |
-| --------------------------- | -------- | ------------------------------------ |
-| `OPENCODE2API_VERSION`      | `latest` | 镜像标签；可指定发行标签来固定版本。 |
-| `OPENCODE2API_PORT`         | `8080`   | 映射到容器 8080 的宿主机端口。       |
-| `OPENCODE2API_WEBUI_PORT`   | `8081`   | 映射到容器 8081 的宿主机端口。       |
-| `OPENCODE2API_LISTEN`       | 未设置   | 显式覆盖容器内 API 监听地址。        |
-| `OPENCODE2API_WEBUI_LISTEN` | 未设置   | 显式覆盖容器内 WebUI 监听地址。      |
-
-后两项在容器内对应 `LISTEN_ADDRESS` 与 `WEBUI_LISTEN_ADDRESS`。值为空时使用配置文件中的地址。首次初始化配置时，入口脚本会将示例 API 地址 `127.0.0.1:8080` 改为 `0.0.0.0:8080`，使其能够通过发布端口访问。
-
-修改宿主机端口不会改变容器内监听地址。如果修改容器内 API 端口，还需要同步调整端口映射和镜像健康检查；默认健康检查使用 8080 端口。
-
-构建并运行本地镜像：
-
-```bash
-docker build -t opencode2api:local .
-docker volume create opencode2api-state
-docker run -d --name opencode2api \
-  -p 8080:8080 -p 8081:8081 \
-  -e CONFIG_SEED_PATH=/run/config/opencode2api.json \
-  -v "$(pwd)/config.json:/run/config/opencode2api.json:ro" \
-  -v opencode2api-state:/var/lib/opencode2api \
-  opencode2api:local
-```
-
-在 Docker 中使用 `proxyfile` 时，代理文件也需要挂载到容器内配置指定的位置。
+代理文件须挂载到容器内，并在配置中使用容器可访问的路径。容器根文件系统只读，状态卷和 `/tmp` 可写；服务通过入口脚本降为非 root 用户运行。
 
 ## API 调用
 

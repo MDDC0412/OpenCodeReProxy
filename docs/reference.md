@@ -1,55 +1,26 @@
 # API, configuration, and runtime reference
 
-[Back to quick start](../README.md) | [简体中文](reference.zh-CN.md)
+[Back to README](../README.md) | [简体中文](reference.zh-CN.md)
 
-Detailed API, configuration, routing, and monitoring documentation. Complete the four-step quick start in the README before using these options.
+Detailed API, configuration, routing, and monitoring documentation. Follow the README instructions for your chosen startup method, configure the service, and verify a request before using these options.
 
-## Docker
+## Docker deployment
 
-Compose defaults to the upstream image `ghcr.io/jasonxu114514/opencode2api`. To run this fork, use the local image build and run commands later in this section.
+This fork's image is `ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics`, supporting Linux amd64 / arm64. See the [README quick start](../README.md#quick-start) for direct Docker, Compose, and source image builds.
 
-```bash
-cp config.example.json config.json
-# Configure keys and replace the WebUI password before starting.
-docker compose up -d
-docker compose logs -f
-```
+Compose imports initial `config.json` into the writable `opencode2api-state` named volume at `/var/lib/opencode2api`. Copy `.env.example` to `.env`; it sets container listeners to `0.0.0.0:8080` / `0.0.0.0:8081` for reachable published ports.
 
-Compose imports the host configuration into the `opencode2api-state` volume **only on first startup**. Subsequent changes should be made through the WebUI. To import an edited host configuration again:
+| Compose variable            | Template value              | Purpose                                |
+| --------------------------- | --------------------------- | -------------------------------------- |
+| `OPENCODE2API_VERSION`      | `v1.3.7-secdev-diagnostics` | This fork's image tag                  |
+| `OPENCODE2API_PORT`         | `8080`                      | Host API port                          |
+| `OPENCODE2API_WEBUI_PORT`   | `8081`                      | Host management port                   |
+| `OPENCODE2API_LISTEN`       | `0.0.0.0:8080`              | Container API listener override        |
+| `OPENCODE2API_WEBUI_LISTEN` | `0.0.0.0:8081`              | Container management listener override |
 
-```bash
-docker compose cp config.json opencode2api:/var/lib/opencode2api/config.json
-docker compose restart
-```
+The volume configuration is authoritative after first initialization. Edit it through management, or follow the [README operations steps](../README.md#deployment-and-operations) to reimport, restore ownership, and restart.
 
-The container runs the service as an unprivileged user. Compose uses a read-only root filesystem, a writable state volume, and a temporary `/tmp` filesystem.
-
-| Compose variable            | Default  | Effect                                            |
-| --------------------------- | -------- | ------------------------------------------------- |
-| `OPENCODE2API_VERSION`      | `latest` | Image tag. Pin a release tag for a fixed version. |
-| `OPENCODE2API_PORT`         | `8080`   | Host port mapped to container port 8080.          |
-| `OPENCODE2API_WEBUI_PORT`   | `8081`   | Host port mapped to container port 8081.          |
-| `OPENCODE2API_LISTEN`       | Unset    | Explicit container API listen override.           |
-| `OPENCODE2API_WEBUI_LISTEN` | Unset    | Explicit container WebUI listen override.         |
-
-The last two variables become `LISTEN_ADDRESS` and `WEBUI_LISTEN_ADDRESS` inside the container. Empty values defer to the configuration file. While initializing a configuration, the entrypoint changes the example API address `127.0.0.1:8080` to `0.0.0.0:8080` so published ports can reach it.
-
-Changing host ports does not change container listeners. If you change the internal API port, also update the port mapping and the image health check, which uses port 8080.
-
-For a local image:
-
-```bash
-docker build -t opencode2api:local .
-docker volume create opencode2api-state
-docker run -d --name opencode2api \
-  -p 8080:8080 -p 8081:8081 \
-  -e CONFIG_SEED_PATH=/run/config/opencode2api.json \
-  -v "$(pwd)/config.json:/run/config/opencode2api.json:ro" \
-  -v opencode2api-state:/var/lib/opencode2api \
-  opencode2api:local
-```
-
-A `proxyfile` used in Docker must also be available inside the container at the configured path.
+Mount any proxy file inside the container and use its container path. Compose has a read-only root filesystem, a writable state volume, and writable `/tmp`. The entrypoint runs the service as an unprivileged user.
 
 ## API usage
 
