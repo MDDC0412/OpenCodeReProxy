@@ -98,7 +98,6 @@ The existing `listen`, `webui.listen`, `server_keys`, `zen_keys`, `go_keys`, `an
 
 ```bash
 curl -i http://127.0.0.1:8080/healthz
-curl -s http://127.0.0.1:8081/api/status | head -c 400
 ```
 
 The management overview page also shows the running version. If the new build fails to start, roll back from the backup:

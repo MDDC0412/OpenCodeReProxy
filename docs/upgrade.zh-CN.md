@@ -98,7 +98,6 @@ sudo systemctl restart opencodereproxy
 
 ```bash
 curl -i http://127.0.0.1:8080/healthz
-curl -s http://127.0.0.1:8081/api/status | head -c 400
 ```
 
 管理页面「总览」页也会显示当前版本。若新程序启动失败，用备份文件回滚：
