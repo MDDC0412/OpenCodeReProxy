@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     OpenCodeReProxy 一键更新（Windows）。
 
@@ -15,7 +15,8 @@
 
 .EXAMPLE
     .\update.ps1
-    更新到最新 Release；默认目录为脚本所在目录的上一级。
+    更新到最新 Release；脚本与 opencode2api.exe 同目录时使用该目录，
+    否则使用脚本所在目录的上一级（仓库 scripts/ 布局）。
 
 .EXAMPLE
     .\update.ps1 -Version v1.4.0-secdev-diagnostics -Directory 'C:\opencodereproxy' -ServiceName opencodereproxy
@@ -62,8 +63,15 @@ if ($Version -notmatch '^v') { Fail "版本号应以 v 开头: $Version" }
 Write-Log "目标版本: $Version"
 
 if (-not $Directory) {
-    if ($env:OPENCODE2API_DIR) { $Directory = $env:OPENCODE2API_DIR }
-    else { $Directory = (Split-Path -Parent $PSScriptRoot) }
+    if ($env:OPENCODE2API_DIR) {
+        $Directory = $env:OPENCODE2API_DIR
+    } elseif (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'opencode2api.exe') -PathType Leaf) {
+        # 脚本与 opencode2api.exe 放在同一目录时直接使用该目录。
+        $Directory = $PSScriptRoot
+    } else {
+        # 仓库布局（scripts/update.ps1）时安装目录是脚本目录的上一级。
+        $Directory = (Split-Path -Parent $PSScriptRoot)
+    }
 }
 if (-not (Test-Path -LiteralPath $Directory -PathType Container)) { Fail "目录不存在: $Directory" }
 
