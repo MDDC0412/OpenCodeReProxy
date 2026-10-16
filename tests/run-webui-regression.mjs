@@ -102,7 +102,11 @@ try {
   config.go_keys = ["browser-fixture-go-key-only"];
   config.anonymous = true;
   config.proxies = ["direct"];
-  config.upstream = { zen: "http://127.0.0.1:19092/zen", go: "http://127.0.0.1:19092/go" };
+  config.upstream = {
+    zen: "http://127.0.0.1:19092/zen",
+    go: "http://127.0.0.1:19092/go",
+    anonymous: "http://127.0.0.1:19092/anonymous",
+  };
   config.models.protocols = Object.fromEntries(
     ["big-pickle", "glm-5.3", "glm-5.3-flash", "kimi-k3", "qwen3.8-max"].map((id) => [id, "chat"]),
   );

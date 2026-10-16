@@ -8,12 +8,19 @@ import (
 	"time"
 
 	"opencode2api/internal/config"
+	"opencode2api/internal/telemetry"
 )
 
 const testKeyA = "sk-local-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 func newTestConfig(keys ...string) config.Config {
 	return config.Config{ServerKeys: keys}
+}
+
+// testKeyViews exercises the view builder without a full runtime manager; the
+// usage counters come from a fresh monitor, matching a just-started process.
+func testKeyViews(cfg config.Config) []APIKeyView {
+	return (&Server{monitor: telemetry.NewMonitor()}).apiKeyViews(cfg)
 }
 
 func TestAPIName(t *testing.T) {
@@ -37,7 +44,7 @@ func TestAPIKeyViews(t *testing.T) {
 	cfg.ServerKeyMetadata = map[string]config.ServerKeyMetadata{
 		config.Fingerprint(testKeyA): {Name: "Claude Code", CreatedAt: time.Now().UTC(), Disabled: true},
 	}
-	views := apiKeyViews(cfg)
+	views := testKeyViews(cfg)
 	if len(views) != 1 {
 		t.Fatalf("want 1 view, got %d", len(views))
 	}
@@ -49,10 +56,10 @@ func TestAPIKeyViews(t *testing.T) {
 	}
 	// A zero CreatedAt must stay absent rather than surface as year 1.
 	cfg.ServerKeyMetadata[config.Fingerprint(testKeyA)] = config.ServerKeyMetadata{Name: "x"}
-	if views = apiKeyViews(cfg); views[0].CreatedAt != nil {
+	if views = testKeyViews(cfg); views[0].CreatedAt != nil {
 		t.Fatal("zero CreatedAt should not be reported")
 	}
-	if got := apiKeyViews(config.Config{}); len(got) != 0 {
+	if got := testKeyViews(config.Config{}); len(got) != 0 {
 		t.Fatalf("empty config should yield no views, got %d", len(got))
 	}
 }

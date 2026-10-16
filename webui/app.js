@@ -512,6 +512,8 @@ function fillConfig(value) {
   $("#c-timeout").value = value.retry.timeout_seconds;
   $("#c-refresh").value = value.models.refresh_seconds;
   $("#c-protocols").value = JSON.stringify(value.models.protocols || {}, null, 2);
+  $("#c-free-only").checked = !!value.models.free_only;
+  $("#c-up-anonymous").value = value.upstream.anonymous;
   const reasoning = value.reasoning || {};
   $("#c-reasoning-effort").value = reasoning.effort || "";
   $("#c-reasoning-by-model").value = JSON.stringify(reasoning.effort_by_model || {}, null, 2);
@@ -571,10 +573,15 @@ $("#config-form").addEventListener("submit", async (event) => {
       proxies: secretInputs("proxies"),
       proxyfile: $("#c-proxyfile").value,
       prefer: $("#c-prefer").value,
-      upstream: { zen: $("#c-up-zen").value, go: $("#c-up-go").value },
+      upstream: {
+        zen: $("#c-up-zen").value,
+        go: $("#c-up-go").value,
+        anonymous: $("#c-up-anonymous").value,
+      },
       retry: { max_attempts: number("#c-attempts"), timeout_seconds: number("#c-timeout") },
       models: {
         refresh_seconds: number("#c-refresh"),
+        free_only: $("#c-free-only").checked,
         protocols: JSON.parse($("#c-protocols").value || "{}"),
       },
       reasoning: {
@@ -1523,6 +1530,9 @@ async function loadAvailability() {
       state.appendChild(item.disabled ? statusCell("停用", "bad") : statusCell("启用", "ok"));
       row.appendChild(state);
       appendCell(row, [item.channel, item.reason].filter(Boolean).join(" / ") || "待探测");
+      const control = document.createElement("td");
+      control.appendChild(statusCell(item.manual ? "手动" : "自动", item.manual ? "warn" : "ok"));
+      row.appendChild(control);
       appendCell(
         row,
         item.auto_effort?.effort
@@ -1530,27 +1540,42 @@ async function loadAvailability() {
           : "未验证",
       );
       appendCell(row, date(item.checked_at));
-      appendCell(row, date(item.next_check));
+      appendCell(row, item.manual ? "手动控制，不自动探测" : date(item.next_check));
       const cell = document.createElement("td"),
-        button = document.createElement("button");
+        button = document.createElement("button"),
+        toggle = document.createElement("button");
       button.className = "btn btn-sm";
       button.textContent = "恢复";
       button.disabled = !item.disabled;
-      button.onclick = async () => {
-        button.disabled = true;
+      toggle.className = "btn btn-sm";
+      toggle.textContent = item.manual ? "切回自动" : "切为手动";
+      const run = async (action) => {
+        button.disabled = toggle.disabled = true;
         try {
-          await api("/api/models/restore", {
-            method: "POST",
-            body: JSON.stringify({ model: item.model }),
-          });
+          await action();
           await loadAvailability();
           await loadDebugModels();
         } catch (error) {
           $("#availability-error").textContent = error.message;
-          button.disabled = false;
+          button.disabled = !item.disabled;
+          toggle.disabled = false;
         }
       };
-      cell.appendChild(button);
+      button.onclick = () =>
+        run(() =>
+          api("/api/models/restore", {
+            method: "POST",
+            body: JSON.stringify({ model: item.model }),
+          }),
+        );
+      toggle.onclick = () =>
+        run(() =>
+          api("/api/models/manual", {
+            method: "POST",
+            body: JSON.stringify({ model: item.model, manual: !item.manual }),
+          }),
+        );
+      cell.append(button, toggle);
       row.appendChild(cell);
       host.appendChild(row);
     }
@@ -1762,6 +1787,10 @@ function renderAPIKeys(keys) {
     const state = document.createElement("td");
     state.appendChild(key.enabled ? statusCell("启用", "ok") : statusCell("停用", "warn"));
     row.appendChild(state);
+    const usage = key.usage || {},
+      summary = (value = {}) =>
+        `${formatTokens(value.requests)} 次 · ${formatTokens(value.total_tokens)} tokens`;
+    appendCell(row, `${summary(usage.last_hour)} / ${summary(usage.lifetime)}`);
     appendCell(row, key.created_at ? localTime(key.created_at) : "已有配置");
 
     const cell = document.createElement("td");

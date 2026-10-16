@@ -284,7 +284,8 @@ Windows PowerShell 可用 `curl.exe`。健康接口返回 200 且 `ready: true` 
 | `prefer`                                       | `"go"`，可选 `"zen"`                                     | 两种付费通道的优先顺序                      |
 | `proxies`                                      | 没有代理配置时使用直连                                   | `["direct"]` 或代理 URL 列表                |
 | `proxyfile`                                    | 空                                                       | 每行一个代理地址；相对路径基于配置目录      |
-| `upstream.zen` / `upstream.go`                 | `https://opencode.ai/zen` / `https://opencode.ai/zen/go` | 上游地址                                    |
+| `upstream.zen` / `upstream.go`                 | `https://opencode.ai/zen` / `https://opencode.ai/zen/go` | 付费上游地址                                |
+| `upstream.anonymous`                           | `https://opencode.ai/inference`                          | 匿名免费通道地址                            |
 | `webui.enabled`                                | 默认 `false`；示例为 `true`                              | 启用管理页面                                |
 | `webui.listen`                                 | `0.0.0.0:8081`                                           | 管理监听；仅本机访问可改为 `127.0.0.1:8081` |
 | `webui.username`                               | 启用管理时必填；示例为 `admin`                           | 管理员用户名                                |
@@ -293,6 +294,7 @@ Windows PowerShell 可用 `curl.exe`。健康接口返回 200 且 `ready: true` 
 | `retry.max_attempts` / `retry.timeout_seconds` | `3` / `300`                                              | 重试次数与请求总超时，单位秒                |
 | `models.refresh_seconds`                       | `300`                                                    | 模型目录刷新周期，单位秒                    |
 | `models.protocols`                             | `{}`                                                     | 自定义模型原生协议覆盖                      |
+| `models.free_only`                             | `false`                                                  | 即使配置了 Key 也只暴露和路由免费模型       |
 | `performance`                                  | 默认值见完整示例                                         | 连接池、连接超时和首事件超时                |
 | `logging.level` / `logging.ring_size`          | `"info"` / `2000`                                        | 日志级别与内存日志条数                      |
 | `logging.dump_request_bodies`                  | `false`                                                  | 是否记录请求体                              |
@@ -544,24 +546,25 @@ npm run test:web
 
 ## 常见问题与故障排查
 
-| 现象                                  | 检查与处理                                                                            |
-| ------------------------------------- | ------------------------------------------------------------------------------------- |
-| 找不到 `config.json`                  | 在运行目录创建该文件；确认没有保存成 `config.json.txt`，或使用 `-config` 指定完整路径 |
-| 修改示例后仍报错                      | 程序读取 `config.json`，先从 `config.example.json` 复制再编辑                         |
-| `parse config.json` / `unknown field` | 检查英文双引号、逗号和字段名；对照配置示例                                            |
-| 管理密码过短 / 缺少密码               | 首次启用管理页面需设置至少 10 个字符的密码                                            |
-| 端口占用                              | 停止自己的旧实例，或修改被占用的 API / 管理端口后重启                                 |
-| 管理页面打不开                        | 检查程序是否仍在运行、`webui.enabled` 与实际管理端口                                  |
-| Docker 提示无法连接 daemon            | 启动 Docker Engine / Docker Desktop，确认使用 Linux 容器                              |
-| 容器运行但访问失败                    | 检查端口映射和卷内实际配置；容器监听使用 `0.0.0.0`；Compose 按示例创建 `.env`         |
-| 修改宿主机配置不生效                  | 容器使用命名卷中的配置；通过管理页面修改或重新导入后重启                              |
-| API 返回 401                          | 客户端使用启用的本地 `server_keys`，不要填写管理密码或上游 Key                        |
-| 免费模型失败 / 502 / 504              | 查看请求台的具体错误及请求 ID，检查模型是否开放、上游凭据、网络与代理                 |
-| 健康接口 503                          | 首次目录可能尚未加载；持续失败时查看目录刷新日志及网络错误                            |
-| HTTP 200 但回答失败                   | 流式响应可能包含错误或异常断流；查看最终请求结果与日志                                |
-| Windows 等待回车                      | 服务已异常停止；保留窗口错误和对应日志，修正后重新启动                                |
-| 明文密码消失                          | 正常迁移为 `password_hash`；仍使用原密码登录                                          |
-| 重启后累计监控消失                    | Session 和监控在内存中；持久运行日志位于 `logs/`                                      |
+| 现象                                  | 检查与处理                                                                                                      |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 找不到 `config.json`                  | 在运行目录创建该文件；确认没有保存成 `config.json.txt`，或使用 `-config` 指定完整路径                           |
+| 修改示例后仍报错                      | 程序读取 `config.json`，先从 `config.example.json` 复制再编辑                                                   |
+| `parse config.json` / `unknown field` | 检查英文双引号、逗号和字段名；对照配置示例                                                                      |
+| 管理密码过短 / 缺少密码               | 首次启用管理页面需设置至少 10 个字符的密码                                                                      |
+| 端口占用                              | 停止自己的旧实例，或修改被占用的 API / 管理端口后重启                                                           |
+| 管理页面打不开                        | 检查程序是否仍在运行、`webui.enabled` 与实际管理端口                                                            |
+| Docker 提示无法连接 daemon            | 启动 Docker Engine / Docker Desktop，确认使用 Linux 容器                                                        |
+| 容器运行但访问失败                    | 检查端口映射和卷内实际配置；容器监听使用 `0.0.0.0`；Compose 按示例创建 `.env`                                   |
+| 修改宿主机配置不生效                  | 容器使用命名卷中的配置；通过管理页面修改或重新导入后重启                                                        |
+| API 返回 401                          | 客户端使用启用的本地 `server_keys`，不要填写管理密码或上游 Key                                                  |
+| 免费模型失败 / 502 / 504              | 查看请求台的具体错误及请求 ID，检查模型是否开放、上游凭据、网络与代理                                           |
+| 健康接口 503                          | 首次目录可能尚未加载；持续失败时查看目录刷新日志及网络错误                                                      |
+| API 返回 503 `proxy_error`            | 全部尝试都失败在代理链路上（代理拨号、CONNECT/SOCKS 握手或隧道 TLS），上游尚未收到请求；检查 Proxy 配置与可用性 |
+| HTTP 200 但回答失败                   | 流式响应可能包含错误或异常断流；查看最终请求结果与日志                                                          |
+| Windows 等待回车                      | 服务已异常停止；保留窗口错误和对应日志，修正后重新启动                                                          |
+| 明文密码消失                          | 正常迁移为 `password_hash`；仍使用原密码登录                                                                    |
+| 重启后累计监控消失                    | Session 和监控在内存中；持久运行日志位于 `logs/`                                                                |
 
 异常退出时保留同一次运行的 `runtime-*`、`crash-*`、存在时的 `console-*` 及轮转备份。诊断机制用于收集原因；此前报告的原版运行中偶发退出尚未复现，不能据此断言根因已经修复。
 

@@ -275,29 +275,31 @@ This is a loadable minimal configuration for anonymous free access. Replace `YOU
 
 The table distinguishes built-in defaults from options explicitly enabled in the example file.
 
-| Setting                                        | Default / requirement                                         | Purpose                                                     |
-| ---------------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------- |
-| `listen`                                       | `127.0.0.1:8080`                                              | API listener                                                |
-| `server_keys`                                  | Required; at least one enabled local key                      | Client API authentication                                   |
-| `zen_keys` / `go_keys`                         | Empty; at least one upstream lane required unless anonymous   | OpenCode credentials                                        |
-| `anonymous`                                    | `false`                                                       | Enable anonymous free Zen access                            |
-| `prefer`                                       | `"go"`; also accepts `"zen"`                                  | Preferred authenticated tier                                |
-| `proxies`                                      | Direct if none configured                                     | `["direct"]` or proxy URL list                              |
-| `proxyfile`                                    | Empty                                                         | One proxy per line; relative to the configuration directory |
-| `upstream.zen` / `upstream.go`                 | `https://opencode.ai/zen` / `https://opencode.ai/zen/go`      | Upstream endpoints                                          |
-| `webui.enabled`                                | `false`; example enables it                                   | Enable management UI                                        |
-| `webui.listen`                                 | `0.0.0.0:8081`                                                | Management listener; use `127.0.0.1:8081` for local access  |
-| `webui.username`                               | Required when management is enabled; example uses `admin`     | Administrator username                                      |
-| `webui.password`                               | Required for initial management setup; at least 10 characters | Migrated to `password_hash` on startup                      |
-| `webui.session_ttl_minutes`                    | `720`                                                         | Session lifetime in minutes                                 |
-| `retry.max_attempts` / `retry.timeout_seconds` | `3` / `300`                                                   | Retry count and total request timeout in seconds            |
-| `models.refresh_seconds`                       | `300`                                                         | Model discovery refresh in seconds                          |
-| `models.protocols`                             | `{}`                                                          | Native protocol overrides                                   |
-| `performance`                                  | See the complete example                                      | Connection pools, connection and first-event timeouts       |
-| `logging.level` / `logging.ring_size`          | `"info"` / `2000`                                             | Log level and in-memory log capacity                        |
-| `logging.dump_request_bodies`                  | `false`                                                       | Request body logging                                        |
-| `reasoning.effort` / `effort_by_model`         | Disabled; complete example uses `"high"`                      | Thinking override when absent from a request                |
-| `rotation`                                     | Built-in group defaults                                       | `sota` / `sweet` aliases, ordering, first-output timeout    |
+| Setting                                        | Default / requirement                                         | Purpose                                                      |
+| ---------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------ |
+| `listen`                                       | `127.0.0.1:8080`                                              | API listener                                                 |
+| `server_keys`                                  | Required; at least one enabled local key                      | Client API authentication                                    |
+| `zen_keys` / `go_keys`                         | Empty; at least one upstream lane required unless anonymous   | OpenCode credentials                                         |
+| `anonymous`                                    | `false`                                                       | Enable anonymous free Zen access                             |
+| `prefer`                                       | `"go"`; also accepts `"zen"`                                  | Preferred authenticated tier                                 |
+| `proxies`                                      | Direct if none configured                                     | `["direct"]` or proxy URL list                               |
+| `proxyfile`                                    | Empty                                                         | One proxy per line; relative to the configuration directory  |
+| `upstream.zen` / `upstream.go`                 | `https://opencode.ai/zen` / `https://opencode.ai/zen/go`      | Authenticated upstream endpoints                             |
+| `upstream.anonymous`                           | `https://opencode.ai/inference`                               | Anonymous free-tier endpoint                                 |
+| `webui.enabled`                                | `false`; example enables it                                   | Enable management UI                                         |
+| `webui.listen`                                 | `0.0.0.0:8081`                                                | Management listener; use `127.0.0.1:8081` for local access   |
+| `webui.username`                               | Required when management is enabled; example uses `admin`     | Administrator username                                       |
+| `webui.password`                               | Required for initial management setup; at least 10 characters | Migrated to `password_hash` on startup                       |
+| `webui.session_ttl_minutes`                    | `720`                                                         | Session lifetime in minutes                                  |
+| `retry.max_attempts` / `retry.timeout_seconds` | `3` / `300`                                                   | Retry count and total request timeout in seconds             |
+| `models.refresh_seconds`                       | `300`                                                         | Model discovery refresh in seconds                           |
+| `models.protocols`                             | `{}`                                                          | Native protocol overrides                                    |
+| `models.free_only`                             | `false`                                                       | Expose and route only free models, even with keys configured |
+| `performance`                                  | See the complete example                                      | Connection pools, connection and first-event timeouts        |
+| `logging.level` / `logging.ring_size`          | `"info"` / `2000`                                             | Log level and in-memory log capacity                         |
+| `logging.dump_request_bodies`                  | `false`                                                       | Request body logging                                         |
+| `reasoning.effort` / `effort_by_model`         | Disabled; complete example uses `"high"`                      | Thinking override when absent from a request                 |
+| `rotation`                                     | Built-in group defaults                                       | `sota` / `sweet` aliases, ordering, first-output timeout     |
 
 Local keys, administrator passwords, and upstream keys serve separate entry points: clients use `server_keys`, management uses the administrator password, and `zen_keys` / `go_keys` authenticate to OpenCode.
 
@@ -544,24 +546,25 @@ Browser regression uses isolated configuration and a local fixture. Reports go t
 
 ## Troubleshooting
 
-| Symptom                                 | Check and action                                                                                                   |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Missing `config.json`                   | Create it in the runtime directory, check for `config.json.txt`, or use an absolute `-config` path                 |
-| Editing the example has no effect       | The app loads `config.json`; copy `config.example.json` first                                                      |
-| `parse config.json` / `unknown field`   | Check quotes, commas, and names against the example                                                                |
-| Missing or short administrator password | Initial management setup requires at least 10 characters                                                           |
-| Port already in use                     | Stop your older instance or change the occupied API / management port and restart                                  |
-| Management page does not open           | Check the running process, `webui.enabled`, and actual management port                                             |
-| Docker cannot connect to daemon         | Start Docker Engine / Desktop and select Linux containers                                                          |
-| Container runs but cannot be reached    | Check published ports and volume configuration; listen on `0.0.0.0` inside the container and create Compose `.env` |
-| Host config edits have no effect        | The volume holds active configuration; edit in management or reimport and restart                                  |
-| API returns 401                         | Use an enabled local `server_keys` value, not an admin password or upstream key                                    |
-| Free model fails / 502 / 504            | Read the Playground error and request ID; inspect availability, upstream keys, network, and proxies                |
-| Health check returns 503                | Initial discovery may be pending; inspect discovery and network logs if it persists                                |
-| HTTP 200 but generation fails           | SSE can report an error or disconnect; check the final request outcome and logs                                    |
-| Windows waits for Enter                 | Service stopped abnormally; retain its reason and logs, fix the cause, and restart                                 |
-| Plaintext password disappears           | Expected migration to `password_hash`; use the original password to sign in                                        |
-| Metrics disappear on restart            | Sessions and metrics are in memory; persistent logs live in `logs/`                                                |
+| Symptom                                 | Check and action                                                                                                                                                   |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Missing `config.json`                   | Create it in the runtime directory, check for `config.json.txt`, or use an absolute `-config` path                                                                 |
+| Editing the example has no effect       | The app loads `config.json`; copy `config.example.json` first                                                                                                      |
+| `parse config.json` / `unknown field`   | Check quotes, commas, and names against the example                                                                                                                |
+| Missing or short administrator password | Initial management setup requires at least 10 characters                                                                                                           |
+| Port already in use                     | Stop your older instance or change the occupied API / management port and restart                                                                                  |
+| Management page does not open           | Check the running process, `webui.enabled`, and actual management port                                                                                             |
+| Docker cannot connect to daemon         | Start Docker Engine / Desktop and select Linux containers                                                                                                          |
+| Container runs but cannot be reached    | Check published ports and volume configuration; listen on `0.0.0.0` inside the container and create Compose `.env`                                                 |
+| Host config edits have no effect        | The volume holds active configuration; edit in management or reimport and restart                                                                                  |
+| API returns 401                         | Use an enabled local `server_keys` value, not an admin password or upstream key                                                                                    |
+| Free model fails / 502 / 504            | Read the Playground error and request ID; inspect availability, upstream keys, network, and proxies                                                                |
+| Health check returns 503                | Initial discovery may be pending; inspect discovery and network logs if it persists                                                                                |
+| API returns 503 `proxy_error`           | Every attempt failed on the proxy route itself (proxy dial, CONNECT/SOCKS handshake, tunnelled TLS) before reaching upstream; check proxy configuration and health |
+| HTTP 200 but generation fails           | SSE can report an error or disconnect; check the final request outcome and logs                                                                                    |
+| Windows waits for Enter                 | Service stopped abnormally; retain its reason and logs, fix the cause, and restart                                                                                 |
+| Plaintext password disappears           | Expected migration to `password_hash`; use the original password to sign in                                                                                        |
+| Metrics disappear on restart            | Sessions and metrics are in memory; persistent logs live in `logs/`                                                                                                |
 
 For unexpected exits, retain the same run's `runtime-*`, `crash-*`, `console-*` when present, and rotation backups. Diagnostics collect evidence. The earlier intermittent exit in the original app has not been reproduced, so its root cause has not been confirmed fixed.
 

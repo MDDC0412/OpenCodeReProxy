@@ -55,7 +55,12 @@ async (page) => {
   const visible = async (selector) => page.locator(selector).waitFor({ state: "visible" });
   const text = (selector) => page.locator(selector).textContent();
   const config = await api("/api/config");
-  assert(config.upstream.zen === `${fixtureURL}/zen` && config.upstream.go === `${fixtureURL}/go`, "Run browser regression only against the local fixture configuration");
+  assert(
+    config.upstream.zen === `${fixtureURL}/zen` &&
+      config.upstream.go === `${fixtureURL}/go` &&
+      config.upstream.anonymous === `${fixtureURL}/anonymous`,
+    "Run browser regression only against the local fixture configuration",
+  );
   for (const key of (await api("/api/api-keys")).keys) {
     if (key.name.startsWith("浏览器回归")) await api(`/api/api-keys/${key.id}`, "DELETE");
   }

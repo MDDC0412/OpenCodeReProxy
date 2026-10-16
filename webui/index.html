@@ -523,6 +523,7 @@
                         <th>模型</th>
                         <th>状态</th>
                         <th>通道 / 结果</th>
+                        <th>控制</th>
                         <th>思考档位</th>
                         <th>上次探测</th>
                         <th>下次探测</th>
@@ -642,6 +643,7 @@
                     <th>名称</th>
                     <th>尾码</th>
                     <th>状态</th>
+                    <th>用量（近 1 小时 / 累计）</th>
                     <th>创建时间</th>
                     <th>操作</th>
                   </tr>
@@ -808,6 +810,15 @@
                 单次尝试超时为 0 时跟随总超时。
               </div>
               <div class="form-grid">
+                <div class="field span-2">
+                  <label class="check"
+                    ><input id="c-free-only" type="checkbox" />仅暴露免费模型（即使配置了 Zen / Go
+                    Key）</label
+                  >
+                </div>
+                <div class="field">
+                  <label for="c-up-anonymous">匿名通道 URL</label><input id="c-up-anonymous" />
+                </div>
                 <div class="field">
                   <label for="c-up-zen">Zen URL</label><input id="c-up-zen" />
                 </div>

@@ -13,14 +13,23 @@ import (
 
 	"opencode2api/internal/config"
 	"opencode2api/internal/httpx"
+	"opencode2api/internal/telemetry"
 )
 
 type APIKeyView struct {
-	ID        string     `json:"id"`
-	Name      string     `json:"name"`
-	Display   string     `json:"display"`
-	Enabled   bool       `json:"enabled"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	ID        string      `json:"id"`
+	Name      string      `json:"name"`
+	Display   string      `json:"display"`
+	Enabled   bool        `json:"enabled"`
+	CreatedAt *time.Time  `json:"created_at,omitempty"`
+	Usage     APIKeyUsage `json:"usage"`
+}
+
+// APIKeyUsage is in-memory like the rest of the monitor: it restarts from zero
+// with the process and survives hot reloads.
+type APIKeyUsage struct {
+	Lifetime telemetry.ServerKeyUsage `json:"lifetime"`
+	Window   telemetry.ServerKeyUsage `json:"last_hour"`
 }
 
 // apiKeyName returns the stored label for a key fingerprint, falling back to a
@@ -32,7 +41,8 @@ func apiKeyName(cfg config.Config, id string, index int) string {
 	return fmt.Sprintf("已有 Key %d", index+1)
 }
 
-func apiKeyViews(cfg config.Config) []APIKeyView {
+func (a *Server) apiKeyViews(cfg config.Config) []APIKeyView {
+	lifetime, window := a.monitor.ServerKeyUsage()
 	items := make([]APIKeyView, 0, len(cfg.ServerKeys))
 	for i, key := range cfg.ServerKeys {
 		id := config.Fingerprint(key)
@@ -41,6 +51,7 @@ func apiKeyViews(cfg config.Config) []APIKeyView {
 			Name:    apiKeyName(cfg, id, i),
 			Display: config.MaskValue(key),
 			Enabled: !cfg.ServerKeyMetadata[id].Disabled,
+			Usage:   APIKeyUsage{Lifetime: lifetime[id], Window: window[id]},
 		}
 		if created := cfg.ServerKeyMetadata[id].CreatedAt; !created.IsZero() {
 			item.CreatedAt = &created
@@ -52,7 +63,7 @@ func apiKeyViews(cfg config.Config) []APIKeyView {
 
 func (a *Server) handleListAPIKeys(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Cache-Control", "no-store")
-	httpx.WriteJSON(w, http.StatusOK, map[string]any{"keys": apiKeyViews(a.manager.Config())})
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"keys": a.apiKeyViews(a.manager.Config())})
 }
 
 func validateKeyName(name string) error {
@@ -118,7 +129,7 @@ func (a *Server) handleCreateAPIKey(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusCreated, map[string]any{
 		"key":  key,
 		"id":   config.Fingerprint(key),
-		"keys": apiKeyViews(a.manager.Config()),
+		"keys": a.apiKeyViews(a.manager.Config()),
 	})
 }
 
