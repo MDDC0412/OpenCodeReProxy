@@ -444,7 +444,7 @@ The ownership step lets the unprivileged service read configuration and persist 
 To upgrade Compose (one command; configuration stays in the volume):
 
 ```bash
-OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics docker compose pull && docker compose up -d
+export OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics && docker compose pull && docker compose up -d
 ```
 
 Binary deployments can use `scripts/update.sh` or `scripts/update.ps1`, which do not re-download the runtime package or touch `config.json`. See [One-command upgrade and in-place update](docs/upgrade.md) for options and rollback.

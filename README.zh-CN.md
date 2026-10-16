@@ -471,7 +471,7 @@ docker compose restart
 升级 Compose（一条命令；配置保存在数据卷中，不需要重新下载运行包）：
 
 ```bash
-OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics docker compose pull && docker compose up -d
+export OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics && docker compose pull && docker compose up -d
 ```
 
 二进制部署可用 `scripts/update.sh` 自动完成「下载 → 校验 SHA256 → 备份旧程序 → 原地替换 → 重启 systemd」，不会改动 `config.json` 与日志：

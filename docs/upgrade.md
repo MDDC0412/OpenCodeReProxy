@@ -12,7 +12,7 @@ Configuration lives in a named volume, so an upgrade only changes the image tag:
 
 ```bash
 cd /path/to/compose-directory
-OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics docker compose pull && docker compose up -d
+export OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics && docker compose pull && docker compose up -d
 ```
 
 Alternatively set `OPENCODE2API_VERSION` in `.env` to the target tag, then run:

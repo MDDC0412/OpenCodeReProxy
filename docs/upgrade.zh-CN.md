@@ -12,7 +12,7 @@
 
 ```bash
 cd /path/to/compose-directory
-OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics docker compose pull && docker compose up -d
+export OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics && docker compose pull && docker compose up -d
 ```
 
 也可以先把 `.env` 里的 `OPENCODE2API_VERSION` 改成目标版本，再执行：
