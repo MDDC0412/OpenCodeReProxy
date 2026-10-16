@@ -28,6 +28,8 @@ Use it locally, deploy it as a self-hosted API service, or modify the source. Op
 14. [Versions and changes](#versions-and-changes)
 15. [License and acknowledgements](#license-and-acknowledgements)
 
+More: [One-command upgrade and in-place update](docs/upgrade.md) · [Service deployment guide](docs/deployment.md)
+
 ## Features
 
 | Feature                  | Description                                                                                          |
@@ -466,7 +468,19 @@ docker compose restart
 
 The ownership step lets the unprivileged service read configuration and persist password migration. For direct Docker, use `docker cp / exec / restart` with container name `opencodereproxy` instead.
 
-To upgrade Compose, set `OPENCODE2API_VERSION` in `.env` to the target tag, then run `docker compose pull` and `docker compose up -d`. For binaries, stop the service, back up configuration and state, replace the executable, and start again.
+To upgrade Compose (one command; configuration stays in the volume and the runtime package is not re-downloaded):
+
+```bash
+OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics docker compose pull && docker compose up -d
+```
+
+For binary deployments, `scripts/update.sh` automates "download → verify SHA256 → back up the old executable → replace in place → restart systemd" without touching `config.json` or logs:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/MDDC0412/OpenCodeReProxy/main/scripts/update.sh | sudo sh
+```
+
+Windows deployments use `scripts/update.ps1`. See [One-command upgrade and in-place update](docs/upgrade.md) for rollback, configuration compatibility, and why this is a brief-interruption in-place upgrade rather than a zero-downtime hot update.
 
 `docker compose down` retains named volumes; `docker compose down -v` removes persistent data. The image health check uses container port 8080. If changing internal ports, update mappings and the health check.
 
@@ -501,6 +515,7 @@ OpenCodeReProxySouce/
 ├── webui/                Embedded HTML, CSS and JavaScript
 ├── tests/                Browser regression source and fixture
 ├── docs/                 Guides, references and README templates
+├── scripts/              One-command update scripts (Linux / macOS / Windows)
 ├── .github/workflows/    Checks and release workflows
 ├── config.example.json   Configuration template
 ├── compose.yaml          Compose deployment

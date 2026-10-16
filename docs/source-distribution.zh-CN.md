@@ -10,6 +10,7 @@
 - `*_test.go`、`tests/`：供二开使用的自动化测试源码。浏览器测试会在运行时生成隔离的演示配置，演示凭据只用于本地模拟上游。
 - `package.json`、`package-lock.json`：前端检查和浏览器测试的开发依赖，不是服务运行依赖。
 - `README.md`、`README.zh-CN.md`、`docs/`、`LICENSE`：使用说明、开发说明及 GPL-3.0-or-later 许可证。
+- `scripts/update.sh`、`scripts/update.ps1`：一键升级脚本，下载目标版本、校验 SHA256 并原地替换程序，保留 `config.json` 与数据；说明见 `docs/upgrade.zh-CN.md`。
 - `.github/`、Docker 文件和格式配置：通用开发与发布工具配置。
 
 使用时自行从 `config.example.json` 创建 `config.json`，替换本地 API Key、管理密码并配置上游通道。源码默认没有 `config.json`。免费匿名通道可设置 `anonymous: true` 并清空 `zen_keys`、`go_keys`；模型是否可用由上游实际返回决定。

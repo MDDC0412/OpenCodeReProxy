@@ -70,5 +70,7 @@ jobs:
           fi
       - run: npm run format:check
       - run: npm run check:web
-      - name: Check container entrypoint syntax
-        run: sh -n docker-entrypoint.sh
+      - name: Check shell script syntax
+        run: |
+          sh -n docker-entrypoint.sh
+          sh -n scripts/update.sh

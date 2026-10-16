@@ -28,6 +28,8 @@ OpenCodeReProxy 是一个使用 Go 编写的 OpenCode Zen / Zen Go API 网关。
 14. [版本与更新记录](#版本与更新记录)
 15. [许可证与致谢](#许可证与致谢)
 
+更多文档：[一键升级与热更新](docs/upgrade.zh-CN.md) · [服务部署指南](docs/deployment.zh-CN.md)
+
 ## 功能特性
 
 | 功能         | 说明                                                                            |
@@ -466,7 +468,19 @@ docker compose restart
 
 上面的所有者修正确保非 root 服务仍可读取配置和保存密码哈希。直接 Docker 部署时，将 `docker compose cp / exec / restart` 换成 `docker cp / exec / restart`，容器名使用 `opencodereproxy`。
 
-升级 Compose：修改 `.env` 的 `OPENCODE2API_VERSION` 为目标版本，执行 `docker compose pull` 和 `docker compose up -d`。二进制升级：先停止服务、备份配置和状态，再替换程序文件后启动。
+升级 Compose（一条命令；配置保存在数据卷中，不需要重新下载运行包）：
+
+```bash
+OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics docker compose pull && docker compose up -d
+```
+
+二进制部署可用 `scripts/update.sh` 自动完成「下载 → 校验 SHA256 → 备份旧程序 → 原地替换 → 重启 systemd」，不会改动 `config.json` 与日志：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/MDDC0412/OpenCodeReProxy/main/scripts/update.sh | sudo sh
+```
+
+Windows 部署使用 `scripts/update.ps1`。完整说明（含回滚、配置兼容性，以及为什么这是「秒级中断的原地升级」而不是零停机热更新）见[一键升级与热更新](docs/upgrade.zh-CN.md)。
 
 `docker compose down` 保留命名卷；`docker compose down -v` 会删除持久数据。当前镜像健康检查使用容器内 8080 端口，修改容器内部端口时需要同步调整端口映射与健康检查。
 
@@ -501,6 +515,7 @@ OpenCodeReProxySouce/
 ├── webui/                内嵌 HTML、CSS 与 JavaScript
 ├── tests/                浏览器回归与模拟上游
 ├── docs/                 使用指南、参考文档与平台模板
+├── scripts/              一键升级脚本（Linux / macOS / Windows）
 ├── .github/workflows/    检查与发布工作流
 ├── config.example.json   配置模板
 ├── compose.yaml          Compose 部署文件

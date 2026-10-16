@@ -442,7 +442,13 @@ docker compose restart
 
 The ownership step lets the unprivileged service read configuration and persist password migration. For direct Docker, use `docker cp / exec / restart` with container name `opencodereproxy` instead.
 
-To upgrade Compose, set `OPENCODE2API_VERSION` in `.env` to the target tag, then run `docker compose pull` and `docker compose up -d`. For binaries, stop the service, back up configuration and state, replace the executable, and start again.
+To upgrade Compose (one command; configuration stays in the volume):
+
+```bash
+OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics docker compose pull && docker compose up -d
+```
+
+Binary deployments can use `scripts/update.sh` or `scripts/update.ps1`, which do not re-download the runtime package or touch `config.json`. See [One-command upgrade and in-place update](docs/upgrade.md) for options and rollback.
 
 `docker compose down` retains named volumes; `docker compose down -v` removes persistent data. The image health check uses container port 8080. If changing internal ports, update mappings and the health check.
 
@@ -474,6 +480,7 @@ OpenCodeReProxy_<version>_windows_<arch>/
 ├── README.zh-CN.md       Chinese README
 ├── CHANGELOG.md          Change history
 ├── docs/                 Guides, references and screenshots
+├── scripts/              One-command update scripts
 └── LICENSE               GPL license
 ```
 

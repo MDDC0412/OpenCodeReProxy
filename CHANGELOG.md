@@ -43,6 +43,18 @@ keeping the fork's rewritten WebUI, documentation, and npm/Prettier toolchain.
   manual / back to automatic) and the config form gained the free-only toggle
   and the anonymous upstream URL.
 
+### Added after the initial release packaging
+
+- `scripts/update.sh` and `scripts/update.ps1` perform a one-command in-place
+  upgrade: download the target Release, verify SHA256, back up the previous
+  executable, replace it, and restart the systemd service (or update a Compose
+  deployment via `--compose`). `config.json`, caches, logs, and service
+  definitions are left untouched.
+- `docs/upgrade.md` and `docs/upgrade.zh-CN.md` document the upgrade paths,
+  v1.3.7 → v1.4.0 configuration compatibility, verification, and rollback, and
+  state explicitly that this is a brief-interruption in-place upgrade rather
+  than a zero-downtime hot update.
+
 ### Kept from the fork
 
 - The nine-page WebUI, its browser regression suite, and the npm / Prettier

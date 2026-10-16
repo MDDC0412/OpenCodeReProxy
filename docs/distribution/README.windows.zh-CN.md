@@ -442,7 +442,13 @@ docker compose restart
 
 上面的所有者修正确保非 root 服务仍可读取配置和保存密码哈希。直接 Docker 部署时，将 `docker compose cp / exec / restart` 换成 `docker cp / exec / restart`，容器名使用 `opencodereproxy`。
 
-升级 Compose：修改 `.env` 的 `OPENCODE2API_VERSION` 为目标版本，执行 `docker compose pull` 和 `docker compose up -d`。二进制升级：先停止服务、备份配置和状态，再替换程序文件后启动。
+升级 Compose（一条命令，配置保留在数据卷中）：
+
+```bash
+OPENCODE2API_VERSION=v1.4.0-secdev-diagnostics docker compose pull && docker compose up -d
+```
+
+二进制升级可用 `scripts/update.sh` 或 `scripts/update.ps1` 一键完成，不需要重新下载整包，也不会改动 `config.json`。完整说明与回滚方式见[一键升级与热更新](docs/upgrade.zh-CN.md)。
 
 `docker compose down` 保留命名卷；`docker compose down -v` 会删除持久数据。当前镜像健康检查使用容器内 8080 端口，修改容器内部端口时需要同步调整端口映射与健康检查。
 
@@ -474,6 +480,7 @@ OpenCodeReProxy_<version>_windows_<arch>/
 ├── README.zh-CN.md       中文自述文档
 ├── CHANGELOG.md          更新记录
 ├── docs/                 使用指南、参考文档与截图
+├── scripts/              一键升级脚本
 └── LICENSE               GPL 许可证
 ```
 

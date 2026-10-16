@@ -64,9 +64,19 @@ sudo systemctl restart opencodereproxy
 
 ## 升级与数据
 
+升级不需要重新下载整包，也不需要重写 `config.json`。推荐用一键脚本完成「下载 → 校验 SHA256 → 备份 → 原地替换 → 重启」，完整参数与回滚方式见[一键升级与热更新](upgrade.zh-CN.md)：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/MDDC0412/OpenCodeReProxy/main/scripts/update.sh | sudo sh
+```
+
+手工步骤：
+
 1. 备份 `/opt/opencodereproxy/` 中的配置、模型状态和需要保留的日志。
 2. 执行 `sudo systemctl stop opencodereproxy`。
 3. 使用 `sudo install -m 755 新程序路径 /opt/opencodereproxy/opencode2api` 替换程序。
 4. 执行 `sudo systemctl start opencodereproxy`，检查服务状态和一次实际请求。
+
+从 v1.3.7 升级到 v1.4.0 无需修改 `config.json`；`upstream.anonymous` 与 `models.free_only` 缺省时保持升级前行为。升级会重启进程并短暂中断服务，进行中的请求不会自动重放。
 
 服务的诊断日志在 `/opt/opencodereproxy/logs/`，systemd 输出通过 `journalctl` 查看。更改监听地址或端口后需要重启服务。远程访问时使用服务器 IP，并将相应监听从 `127.0.0.1` 调整为可访问的接口。

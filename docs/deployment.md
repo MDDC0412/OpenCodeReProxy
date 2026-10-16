@@ -64,9 +64,19 @@ Check readiness with `curl -i http://127.0.0.1:8080/healthz`. Open management at
 
 ## Upgrade and preserve state
 
+Upgrading does not require re-downloading the runtime package or rewriting `config.json`. The recommended path uses the one-command script (download → verify SHA256 → back up → replace in place → restart); see [One-command upgrade and in-place update](upgrade.md) for all options and rollback:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/MDDC0412/OpenCodeReProxy/main/scripts/update.sh | sudo sh
+```
+
+Manual steps:
+
 1. Back up configuration, model state, and required logs in `/opt/opencodereproxy/`.
 2. Run `sudo systemctl stop opencodereproxy`.
 3. Replace the executable with `sudo install -m 755 NEW_BINARY_PATH /opt/opencodereproxy/opencode2api`.
 4. Run `sudo systemctl start opencodereproxy`, check status, and verify an actual request.
+
+Upgrading from v1.3.7 to v1.4.0 needs no `config.json` changes; `upstream.anonymous` and `models.free_only` default to the previous behaviour. The process restarts, so the service is briefly interrupted and in-flight requests are not replayed.
 
 Diagnostics live in `/opt/opencodereproxy/logs/`; read systemd output with `journalctl`. Restart after listener or port changes. For remote access use the server IP and adjust the relevant listener from `127.0.0.1` to a reachable interface.
