@@ -6,13 +6,13 @@ Detailed API, configuration, routing, and monitoring documentation. Follow the R
 
 ## Docker deployment
 
-This fork's image is `ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics`, supporting Linux amd64 / arm64. See the [README quick start](../README.md#quick-start) for direct Docker, Compose, and source image builds.
+This fork's image is `ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics`, supporting Linux amd64 / arm64. See the [README quick start](../README.md#quick-start) for direct Docker, Compose, and source image builds.
 
 Compose imports initial `config.json` into the writable `opencode2api-state` named volume at `/var/lib/opencode2api`. Copy `.env.example` to `.env`; it sets container listeners to `0.0.0.0:8080` / `0.0.0.0:8081` for reachable published ports.
 
 | Compose variable            | Template value              | Purpose                                |
 | --------------------------- | --------------------------- | -------------------------------------- |
-| `OPENCODE2API_VERSION`      | `v1.3.7-secdev-diagnostics` | This fork's image tag                  |
+| `OPENCODE2API_VERSION`      | `v1.4.0-secdev-diagnostics` | This fork's image tag                  |
 | `OPENCODE2API_PORT`         | `8080`                      | Host API port                          |
 | `OPENCODE2API_WEBUI_PORT`   | `8081`                      | Host management port                   |
 | `OPENCODE2API_LISTEN`       | `0.0.0.0:8080`              | Container API listener override        |

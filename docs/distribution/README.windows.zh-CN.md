@@ -6,7 +6,7 @@
 
 OpenCodeReProxy 是一个使用 Go 编写的 OpenCode Zen / Zen Go API 网关。它将上游模型接入统一服务，为支持 OpenAI 或 Anthropic 接口的客户端提供本地访问入口，并通过内嵌管理页面完成配置、密钥管理、模型查看和请求排查。
 
-本项目基于 [OpenCode2API](https://github.com/jasonxu114514/opencode2api) v1.3.7 二次开发，增加管理页面改进、CC Switch 导入和持久化异常退出诊断。程序名称沿用 `opencode2api.exe` / `opencode2api`。
+本项目基于 [OpenCode2API](https://github.com/jasonxu114514/opencode2api) v1.4.0 二次开发，增加管理页面改进、CC Switch 导入和持久化异常退出诊断。程序名称沿用 `opencode2api.exe` / `opencode2api`。
 
 适用于个人本地使用、自托管 API 服务和继续二次开发。上游模型、额度和访问条件由 OpenCode 决定；免费匿名通道只支持当前开放的免费模型。
 
@@ -74,7 +74,7 @@ OpenCodeReProxy 是一个使用 Go 编写的 OpenCode Zen / Zen Go API 网关。
 
 ## 下载与安装
 
-[源码仓库](https://github.com/MDDC0412/OpenCodeReProxy) · [Release 下载](https://github.com/MDDC0412/OpenCodeReProxy/releases) · [当前版本](https://github.com/MDDC0412/OpenCodeReProxy/releases/tag/v1.3.7-secdev-diagnostics)
+[源码仓库](https://github.com/MDDC0412/OpenCodeReProxy) · [Release 下载](https://github.com/MDDC0412/OpenCodeReProxy/releases) · [当前版本](https://github.com/MDDC0412/OpenCodeReProxy/releases/tag/v1.4.0-secdev-diagnostics)
 
 | 文件或渠道                                                   | 用途                                      |
 | ------------------------------------------------------------ | ----------------------------------------- |
@@ -83,7 +83,7 @@ OpenCodeReProxy 是一个使用 Go 编写的 OpenCode Zen / Zen Go API 网关。
 | `opencode2api_*_<系统>_<架构>.zip / .tar.gz`                 | 自动发布的 amd64 / arm64 / macOS 运行包   |
 | `OpenCodeReProxy_*_source.zip`                               | 干净源码；目录名为 `OpenCodeReProxySouce` |
 | GitHub 的 `Source code`                                      | 对应 Release 标签的源码快照，需要自行编译 |
-| `ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics` | 本二开版 Docker 镜像                      |
+| `ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics` | 本二开版 Docker 镜像                      |
 | `SHA256SUMS.txt` / `*.sha256`                                | 校验下载包完整性                          |
 
 下载后先解压整个运行包。已有配置的用户保留自己的 `config.json`，通过 `-config` 指定路径即可。
@@ -148,7 +148,7 @@ go run ./cmd/opencode2api -config ./config.json
 Linux / macOS 终端：
 
 ```bash
-docker pull ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics
+docker pull ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics
 docker run -d --name opencodereproxy --restart unless-stopped \
   -p 8080:8080 -p 8081:8081 \
   -e CONFIG_SEED_PATH=/run/config/config.json \
@@ -156,7 +156,7 @@ docker run -d --name opencodereproxy --restart unless-stopped \
   -e WEBUI_LISTEN_ADDRESS=0.0.0.0:8081 \
   --mount "type=bind,source=$(pwd)/config.json,target=/run/config/config.json,readonly" \
   --mount type=volume,source=opencodereproxy-state,target=/var/lib/opencode2api \
-  ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics
+  ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics
 docker logs -f opencodereproxy
 ```
 
@@ -164,7 +164,7 @@ Windows PowerShell：
 
 ```powershell
 $configFile = (Resolve-Path .\config.json).Path
-docker pull ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics
+docker pull ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics
 docker run -d --name opencodereproxy --restart unless-stopped `
   -p 8080:8080 -p 8081:8081 `
   -e CONFIG_SEED_PATH=/run/config/config.json `
@@ -172,7 +172,7 @@ docker run -d --name opencodereproxy --restart unless-stopped `
   -e WEBUI_LISTEN_ADDRESS=0.0.0.0:8081 `
   --mount "type=bind,source=$configFile,target=/run/config/config.json,readonly" `
   --mount type=volume,source=opencodereproxy-state,target=/var/lib/opencode2api `
-  ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics
+  ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics
 docker logs -f opencodereproxy
 ```
 
@@ -285,7 +285,7 @@ Compose 通过同目录的 `.env` 读取以下变量。首次从 [.env.example](
 
 | 变量                        | 模板值                      | 用途                |
 | --------------------------- | --------------------------- | ------------------- |
-| `OPENCODE2API_VERSION`      | `v1.3.7-secdev-diagnostics` | 本项目镜像标签      |
+| `OPENCODE2API_VERSION`      | `v1.4.0-secdev-diagnostics` | 本项目镜像标签      |
 | `OPENCODE2API_PORT`         | `8080`                      | 宿主机 API 端口     |
 | `OPENCODE2API_WEBUI_PORT`   | `8081`                      | 宿主机管理端口      |
 | `OPENCODE2API_LISTEN`       | `0.0.0.0:8080`              | 容器内 API 监听覆盖 |
@@ -545,13 +545,18 @@ npm run test:web
 
 ## 版本与更新记录
 
-当前程序版本为 `v1.3.7-secdev-diagnostics`，以 OpenCode2API v1.3.7 为基础。
+当前程序版本为 `v1.4.0-secdev-diagnostics`，基线为上游 OpenCode2API v1.4.0（本次已同步 v1.3.8 – v1.4.0）。
 
-| 类别     | 主要变化                                                 |
-| -------- | -------------------------------------------------------- |
-| 管理页面 | 九页导航、请求台、API Key 管理、CC Switch 导入、亮暗主题 |
-| 总览检查 | 检查摘要与异常数量一致，每项状态有独立边框和处理入口     |
-| 运行诊断 | Windows 异常窗口保留，持久化运行、控制台和 Go 崩溃日志   |
+| 类别       | 主要变化                                                                                                       |
+| ---------- | -------------------------------------------------------------------------------------------------------------- |
+| 代理错误   | 所有尝试都失败在代理链路（代理拨号、CONNECT/SOCKS 握手或隧道 TLS）时返回 503 `proxy_error`，不再误报为上游 502 |
+| 免费通道   | 匿名通道改用独立上游主机 `upstream.anonymous`；新增 `models.free_only`，只暴露并路由免费模型                   |
+| 用量统计   | 按服务端密钥与会话统计用量，API Key 列表显示每把密钥的用量                                                     |
+| 模型接口   | `/v1/models` 增加 `cost` 与可选推理等级，并提供 `auto` 档探测                                                  |
+| 兼容性修复 | 跨协议保留工具结果图片、`max_output_tokens` 下限 16、整次尝试统一超时、请求头阶段断连返回 499                  |
+| 管理页面   | 九页导航、请求台、API Key 管理、CC Switch 导入、亮暗主题                                                       |
+| 总览检查   | 检查摘要与异常数量一致，每项状态有独立边框和处理入口                                                           |
+| 运行诊断   | Windows 异常窗口保留，持久化运行、控制台和 Go 崩溃日志                                                         |
 
 版本下载见 [Releases](https://github.com/MDDC0412/OpenCodeReProxy/releases)，后续变化见 [CHANGELOG](CHANGELOG.md)。
 

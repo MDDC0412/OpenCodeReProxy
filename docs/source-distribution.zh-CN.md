@@ -39,4 +39,4 @@ npm run test:web
 
 ## 发布归属
 
-本项目基于上游 OpenCode2API v1.3.7。二开发布请保留上游归属与 GPL-3.0-or-later 许可证，并使用自己的仓库和发布地址。本项目的 Docker 镜像为 `ghcr.io/mddc0412/opencodereproxy`，Compose 默认使用 `v1.3.7-secdev-diagnostics` 标签；上游预编译文件不包含本二开版改动。
+本项目基于上游 OpenCode2API v1.4.0。二开发布请保留上游归属与 GPL-3.0-or-later 许可证，并使用自己的仓库和发布地址。本项目的 Docker 镜像为 `ghcr.io/mddc0412/opencodereproxy`，Compose 默认使用 `v1.4.0-secdev-diagnostics` 标签；上游预编译文件不包含本二开版改动。

@@ -6,13 +6,13 @@
 
 ## Docker 部署
 
-本项目的镜像为 `ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics`，支持 Linux amd64 / arm64。直接运行、Compose 和源码构建命令见 [README 快速启动](../README.zh-CN.md#快速启动)。
+本项目的镜像为 `ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics`，支持 Linux amd64 / arm64。直接运行、Compose 和源码构建命令见 [README 快速启动](../README.zh-CN.md#快速启动)。
 
 Compose 从 `config.json` 导入初始配置，将可写状态保存在 `opencode2api-state` 命名卷的 `/var/lib/opencode2api`。首次复制 `.env.example` 为 `.env`，模板显式设置容器监听 `0.0.0.0:8080` / `0.0.0.0:8081`，以便端口映射可达。
 
 | Compose 变量                | 模板值                      | 作用                |
 | --------------------------- | --------------------------- | ------------------- |
-| `OPENCODE2API_VERSION`      | `v1.3.7-secdev-diagnostics` | 本项目镜像标签      |
+| `OPENCODE2API_VERSION`      | `v1.4.0-secdev-diagnostics` | 本项目镜像标签      |
 | `OPENCODE2API_PORT`         | `8080`                      | 宿主机 API 端口     |
 | `OPENCODE2API_WEBUI_PORT`   | `8081`                      | 宿主机管理端口      |
 | `OPENCODE2API_LISTEN`       | `0.0.0.0:8080`              | 容器内 API 监听覆盖 |

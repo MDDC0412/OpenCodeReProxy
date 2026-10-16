@@ -6,7 +6,7 @@
 
 OpenCodeReProxy is a Go gateway for OpenCode Zen / Zen Go. It provides a single endpoint for clients that support OpenAI or Anthropic APIs, with an embedded management UI for configuration, local keys, models, and request diagnostics.
 
-This fork is based on [OpenCode2API](https://github.com/jasonxu114514/opencode2api) v1.3.7 and adds management UI improvements, CC Switch imports, and persistent exit diagnostics. Executable names remain `opencode2api.exe` / `opencode2api`.
+This fork is based on [OpenCode2API](https://github.com/jasonxu114514/opencode2api) v1.4.0 and adds management UI improvements, CC Switch imports, and persistent exit diagnostics. Executable names remain `opencode2api.exe` / `opencode2api`.
 
 Use it locally, deploy it as a self-hosted API service, or modify the source. OpenCode controls upstream model availability, quotas, and access requirements. Anonymous access covers only models currently offered free.
 
@@ -74,7 +74,7 @@ The service needs access to OpenCode and its model catalog. Configuration and st
 
 ## Download and installation
 
-[Repository](https://github.com/MDDC0412/OpenCodeReProxy) · [Downloads](https://github.com/MDDC0412/OpenCodeReProxy/releases) · [Current release](https://github.com/MDDC0412/OpenCodeReProxy/releases/tag/v1.3.7-secdev-diagnostics)
+[Repository](https://github.com/MDDC0412/OpenCodeReProxy) · [Downloads](https://github.com/MDDC0412/OpenCodeReProxy/releases) · [Current release](https://github.com/MDDC0412/OpenCodeReProxy/releases/tag/v1.4.0-secdev-diagnostics)
 
 | File or channel                                              | Purpose                                           |
 | ------------------------------------------------------------ | ------------------------------------------------- |
@@ -83,7 +83,7 @@ The service needs access to OpenCode and its model catalog. Configuration and st
 | `opencode2api_*_<os>_<arch>.zip / .tar.gz`                   | Automated amd64, arm64, and macOS binary packages |
 | `OpenCodeReProxy_*_source.zip`                               | Clean source in `OpenCodeReProxySouce`            |
 | GitHub's `Source code`                                       | Source at the release tag; compile it yourself    |
-| `ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics` | This fork's Docker image                          |
+| `ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics` | This fork's Docker image                          |
 | `SHA256SUMS.txt` / `*.sha256`                                | Download integrity checks                         |
 
 Extract the entire binary archive. If you already have a configuration, retain it and select its path with `-config`.
@@ -147,7 +147,7 @@ Prepare and edit `config.json` first. Start Docker and select Linux containers.
 Linux / macOS terminal:
 
 ```bash
-docker pull ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics
+docker pull ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics
 docker run -d --name opencodereproxy --restart unless-stopped \
   -p 8080:8080 -p 8081:8081 \
   -e CONFIG_SEED_PATH=/run/config/config.json \
@@ -155,7 +155,7 @@ docker run -d --name opencodereproxy --restart unless-stopped \
   -e WEBUI_LISTEN_ADDRESS=0.0.0.0:8081 \
   --mount "type=bind,source=$(pwd)/config.json,target=/run/config/config.json,readonly" \
   --mount type=volume,source=opencodereproxy-state,target=/var/lib/opencode2api \
-  ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics
+  ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics
 docker logs -f opencodereproxy
 ```
 
@@ -163,7 +163,7 @@ Windows PowerShell:
 
 ```powershell
 $configFile = (Resolve-Path .\config.json).Path
-docker pull ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics
+docker pull ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics
 docker run -d --name opencodereproxy --restart unless-stopped `
   -p 8080:8080 -p 8081:8081 `
   -e CONFIG_SEED_PATH=/run/config/config.json `
@@ -171,7 +171,7 @@ docker run -d --name opencodereproxy --restart unless-stopped `
   -e WEBUI_LISTEN_ADDRESS=0.0.0.0:8081 `
   --mount "type=bind,source=$configFile,target=/run/config/config.json,readonly" `
   --mount type=volume,source=opencodereproxy-state,target=/var/lib/opencode2api `
-  ghcr.io/mddc0412/opencodereproxy:v1.3.7-secdev-diagnostics
+  ghcr.io/mddc0412/opencodereproxy:v1.4.0-secdev-diagnostics
 docker logs -f opencodereproxy
 ```
 
@@ -284,7 +284,7 @@ Compose reads the following variables from `.env` in the same directory. Copy [.
 
 | Variable                    | Template value              | Purpose                                |
 | --------------------------- | --------------------------- | -------------------------------------- |
-| `OPENCODE2API_VERSION`      | `v1.3.7-secdev-diagnostics` | This project's image tag               |
+| `OPENCODE2API_VERSION`      | `v1.4.0-secdev-diagnostics` | This project's image tag               |
 | `OPENCODE2API_PORT`         | `8080`                      | Host API port                          |
 | `OPENCODE2API_WEBUI_PORT`   | `8081`                      | Host management port                   |
 | `OPENCODE2API_LISTEN`       | `0.0.0.0:8080`              | Container API listener override        |
@@ -544,13 +544,18 @@ Create a branch in your fork and describe the problem, resulting behavior, and v
 
 ## Versions and changes
 
-The current executable release is `v1.3.7-secdev-diagnostics`, based on OpenCode2API v1.3.7.
+The current executable release is `v1.4.0-secdev-diagnostics`, based on upstream OpenCode2API v1.4.0 (synced from v1.3.8 through v1.4.0).
 
-| Area            | Changes                                                                              |
-| --------------- | ------------------------------------------------------------------------------------ |
-| Management      | Nine-page navigation, Playground, local keys, CC Switch import, light/dark themes    |
-| Overview checks | Consistent summary and issue counts, bordered status items, action links             |
-| Diagnostics     | Preserved Windows failure console and persistent runtime, console, and Go crash logs |
+| Area            | Changes                                                                                                                                                                       |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Proxy errors    | When every attempt fails on the proxy route (proxy dial, CONNECT/SOCKS handshake, tunnelled TLS) the API answers 503 `proxy_error` instead of a generic upstream 502          |
+| Free tier       | The anonymous lane moved to its own host `upstream.anonymous`; `models.free_only` exposes and routes only free models                                                         |
+| Usage           | Usage is tracked per server key and per session; the API key list shows per-key usage                                                                                         |
+| Models API      | `/v1/models` reports `cost` and available reasoning levels, with an `auto` effort probe                                                                                       |
+| Compatibility   | Tool-result images survive cross-protocol conversion, `max_output_tokens` is floored at 16, attempt timeouts cover the whole attempt, and header-phase disconnects return 499 |
+| Management      | Nine-page navigation, Playground, local keys, CC Switch import, light/dark themes                                                                                             |
+| Overview checks | Consistent summary and issue counts, bordered status items, action links                                                                                                      |
+| Diagnostics     | Preserved Windows failure console and persistent runtime, console, and Go crash logs                                                                                          |
 
 Download versions from [Releases](https://github.com/MDDC0412/OpenCodeReProxy/releases). See [CHANGELOG](CHANGELOG.md) for subsequent changes.
 

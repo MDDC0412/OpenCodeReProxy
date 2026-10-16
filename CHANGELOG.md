@@ -1,6 +1,12 @@
 # Changelog
 
-## Upstream sync — 2026-10-16
+## v1.4.0-secdev-diagnostics
+
+First fork release rebased on upstream OpenCode2API v1.4.0. It merges upstream
+v1.3.8 through v1.4.0 plus the post-release `proxy_error` fix while keeping the
+fork's WebUI, documentation, and npm / Prettier toolchain.
+
+### Upstream sync — 2026-10-16
 
 Merge upstream `jasonxu114514/opencode2api` v1.3.8 through v1.4.0 plus the
 post-release `proxy_error` fix (upstream `main` @ `a6601da`) into the fork while
